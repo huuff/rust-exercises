@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 pub enum TemperatureUnit {
@@ -30,10 +31,9 @@ pub struct ParseTemperatureUnitError {}
     type Err = ParseTemperatureUnitError;
     
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-	// TODO: Use once_cell
-	let regex = Regex::new(r"(?P<amount>\d+)(?P<unit>C|F)").expect("Wrong TemperatureUnit regex");
+	static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?P<amount>\d+)(?P<unit>C|F)").expect("Wrong TemperatureUnit regex"));
 
-	if let Some(captures) = regex.captures(s) {
+	if let Some(captures) = RE.captures(s) {
 	    // TODO: No unwrappin?
 	    let amount = captures["amount"].parse::<i64>().unwrap();
 	    match &captures["unit"] {
