@@ -6,28 +6,26 @@ use std::{
     process,
 };
 use unit::TemperatureUnit;
-use exitcode;
-use regex::Regex;
 
+const INPUT_ERROR_MESSAGE: &str = "You must provide an input amount and unit. Examples: 32Cº, 45F";
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
     let Some(input) = &args.get(1) else {
-	eprintln!("Wrong number of arguments, exactly one is needed");
-	process::exit(exitcode::DATAERR);
+	crash(INPUT_ERROR_MESSAGE);
     };
 
     let Ok(unit) = input.parse::<TemperatureUnit>() else {
-	eprintln!("Wrong number of arguments, exactly one is needed");
-	process::exit(exitcode::DATAERR);
+	crash(INPUT_ERROR_MESSAGE);
     };
 
-    match unit {
-	TemperatureUnit::Celsius(amount) => println!("You entered {amount} celsius"),
-	TemperatureUnit::Fahrenheit(amount) => println!("You entered {amount} fahrenheit"),
-    }
+    println!("You entered {} {}", unit.amount(), unit.name());
 
     Ok(())
-    
+}
+
+fn crash(message: &str) -> ! {
+    eprintln!("{message}");
+    process::exit(1);
 }

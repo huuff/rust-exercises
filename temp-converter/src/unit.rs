@@ -6,6 +6,22 @@ pub enum TemperatureUnit {
     Fahrenheit(i64),
 }
 
+impl TemperatureUnit {
+    pub fn name(&self) -> &'static str {
+	match self {
+	    TemperatureUnit::Celsius(_) => "celsius",
+	    TemperatureUnit::Fahrenheit(_) => "fahrenheit",
+	}
+    }
+
+    pub fn amount(&self) -> i64 {
+	match self {
+	    TemperatureUnit::Celsius(amount) => *amount,
+	    TemperatureUnit::Fahrenheit(amount) => *amount,
+	}
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseTemperatureUnitError {}
 
@@ -18,7 +34,7 @@ pub struct ParseTemperatureUnitError {}
 
 	if let Some(captures) = regex.captures(s) {
 	    // TODO: No unwrappin?
-	    let amount = (&captures["amount"]).parse::<i64>().unwrap();
+	    let amount = captures["amount"].parse::<i64>().unwrap();
 	    match &captures["unit"] {
 		"C" => Ok(TemperatureUnit::Celsius(amount)),
 		"F" => Ok(TemperatureUnit::Fahrenheit(amount)),
