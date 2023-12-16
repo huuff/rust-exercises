@@ -22,6 +22,7 @@ impl TemperatureUnit {
     }
 }
 
+// TODO: Test
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseTemperatureUnitError {}
 
