@@ -9,19 +9,23 @@ pub enum TemperatureUnit {
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseTemperatureUnitError {}
 
-impl FromStr for TemperatureUnit {
+ impl FromStr for TemperatureUnit {
     type Err = ParseTemperatureUnitError;
     
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-	let celsius_regex = Regex::new(r"(\d+)C").expect("Wrong celsius regex");
-	let fahrenheit_regex = Regex::new(r"(\d+)F").expect("Wrong fahrenheit regex");
+	// TODO: Use once_cell
+	let regex = Regex::new(r"(?P<amount>\d+)(?P<unit>C|F)").expect("Wrong TemperatureUnit regex");
 
-	if celsius_regex.is_match(s) {
-	    Ok(Self::Celsius(0))
-	} else if fahrenheit_regex.is_match(s) {
-	    Ok(Self::Fahrenheit(0))
+	if let Some(captures) = regex.captures(s) {
+	    // TODO: No unwrappin?
+	    let amount = (&captures["amount"]).parse::<i64>().unwrap();
+	    match &captures["unit"] {
+		"C" => Ok(TemperatureUnit::Celsius(amount)),
+		"F" => Ok(TemperatureUnit::Fahrenheit(amount)),
+		_ => Err(ParseTemperatureUnitError {}),
+	    }
 	} else {
-	    Err(ParseTemperatureUnitError{}) 
+	    Err(ParseTemperatureUnitError {})
 	}
 
     }

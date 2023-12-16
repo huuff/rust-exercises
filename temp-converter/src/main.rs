@@ -5,35 +5,28 @@ use std::{
     error::Error,
     process,
 };
+use unit::TemperatureUnit;
 use exitcode;
 use regex::Regex;
 
-enum TemperatureUnit {
-    Celsius,
-    Fahrenheit,
-}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() != 2 {
+    let Some(input) = &args.get(1) else {
 	eprintln!("Wrong number of arguments, exactly one is needed");
 	process::exit(exitcode::DATAERR);
-    }
-
-    let input = &args[0];
-
-    let celsius_regex = Regex::new(r"(\d+)C")?;
-    let fahrenheit_regex = Regex::new(r"(\d+)F")?;
-
-
-    let unit: Option<TemperatureUnit> = if celsius_regex.is_match(&input) {
-	Some(TemperatureUnit::Celsius)
-    } else if fahrenheit_regex.is_match(&input) {
-	Some(TemperatureUnit::Fahrenheit)
-    } else {
-	None
     };
+
+    let Ok(unit) = input.parse::<TemperatureUnit>() else {
+	eprintln!("Wrong number of arguments, exactly one is needed");
+	process::exit(exitcode::DATAERR);
+    };
+
+    match unit {
+	TemperatureUnit::Celsius(amount) => println!("You entered {amount} celsius"),
+	TemperatureUnit::Fahrenheit(amount) => println!("You entered {amount} fahrenheit"),
+    }
 
     Ok(())
     
