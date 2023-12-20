@@ -32,6 +32,7 @@ pub struct ParseTemperatureUnitError {}
     fn from_str(s: &str) -> Result<Self, Self::Err> {
 	static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?P<amount>\d+)(?P<unit>C|F)").expect("Wrong TemperatureUnit regex"));
 
+	// TODO: Can I make this nicer?
 	if let Some(captures) = RE.captures(s) {
 	    // TODO: No unwrappin?
 	    let amount = captures["amount"].parse::<i64>().unwrap();
