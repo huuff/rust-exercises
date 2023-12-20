@@ -12,13 +12,9 @@ const INPUT_ERROR_MESSAGE: &str = "You must provide an input amount and unit. Ex
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
-    let Some(input) = &args.get(1) else {
-	crash(INPUT_ERROR_MESSAGE);
-    };
+    let Some(input) = &args.get(1) else { crash(INPUT_ERROR_MESSAGE); };
 
-    let Ok(unit) = input.parse::<TemperatureUnit>() else {
-	crash(INPUT_ERROR_MESSAGE);
-    };
+    let Ok(unit) = input.parse::<TemperatureUnit>() else { crash(INPUT_ERROR_MESSAGE); };
 
     println!("You entered {} {}", unit.amount(), unit.name());
 
