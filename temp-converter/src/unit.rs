@@ -17,8 +17,7 @@ impl TemperatureUnit {
 
     pub fn amount(&self) -> i64 {
 	match self {
-	    TemperatureUnit::Celsius(amount) => *amount,
-	    TemperatureUnit::Fahrenheit(amount) => *amount,
+	    TemperatureUnit::Celsius(amount) | TemperatureUnit::Fahrenheit(amount) => *amount
 	}
     }
 }
