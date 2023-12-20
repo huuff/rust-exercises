@@ -18,6 +18,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     println!("You entered {} {}", unit.amount(), unit.name());
 
+    let result = match unit {
+        TemperatureUnit::Celsius(_) => unit.to_fahrenheit(),
+        TemperatureUnit::Fahrenheit(_) => unit.to_celsius(),
+    };
+
+    println!("That equals {} {}", result.amount(), result.name());
+
+
     Ok(())
 }
 
