@@ -49,8 +49,8 @@ pub struct ParseTemperatureUnitError {}
 
 	// TODO: Can I make this nicer?
 	if let Some(captures) = RE.captures(s) {
-	    // TODO: No unwrappin?
-	    let amount = captures["amount"].parse::<f64>().unwrap();
+	    let amount = captures["amount"].parse::<f64>()
+		.or_else(|_| Err(ParseTemperatureUnitError{}))?;
 	    match &captures["unit"] {
 		"C" => Ok(TemperatureUnit::Celsius(amount)),
 		"F" => Ok(TemperatureUnit::Fahrenheit(amount)),
