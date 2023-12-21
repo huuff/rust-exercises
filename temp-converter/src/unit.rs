@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, fmt::Display};
 use once_cell::sync::Lazy;
 use regex::Regex;
 
@@ -8,19 +8,6 @@ pub enum TemperatureUnit {
 }
 
 impl TemperatureUnit {
-    // TODO: Rather than amount and name, implement display and limit precision so it's not ugly
-    pub fn name(&self) -> &'static str {
-	match self {
-	    TemperatureUnit::Celsius(_) => "celsius",
-	    TemperatureUnit::Fahrenheit(_) => "fahrenheit",
-	}
-    }
-
-    pub fn amount(&self) -> f64 {
-	match self {
-	    TemperatureUnit::Celsius(amount) | TemperatureUnit::Fahrenheit(amount) => *amount
-	}
-    }
 
     pub fn to_celsius(self) -> TemperatureUnit {
 	match self {
@@ -37,6 +24,15 @@ impl TemperatureUnit {
 		TemperatureUnit::Fahrenheit((amount * 5.0/9.0) + 32.0)
 	    },
 	    TemperatureUnit::Fahrenheit(_) => self,
+	}
+    }
+}
+
+impl Display for TemperatureUnit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+	match self {
+	    TemperatureUnit::Celsius(amount) => write!(f, "{}C", amount),
+	    TemperatureUnit::Fahrenheit(amount) => write!(f, "{}F", amount),
 	}
     }
 }

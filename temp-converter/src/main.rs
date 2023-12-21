@@ -14,16 +14,16 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let Some(input) = &args.get(1) else { crash(INPUT_ERROR_MESSAGE); };
 
-    let Ok(unit) = input.parse::<TemperatureUnit>() else { crash(INPUT_ERROR_MESSAGE); };
+    let Ok(input) = input.parse::<TemperatureUnit>() else { crash(INPUT_ERROR_MESSAGE); };
 
-    println!("You entered {} {}", unit.amount(), unit.name());
+    println!("You entered {input}");
 
-    let result = match unit {
-        TemperatureUnit::Celsius(_) => unit.to_fahrenheit(),
-        TemperatureUnit::Fahrenheit(_) => unit.to_celsius(),
+    let result = match input {
+        TemperatureUnit::Celsius(_) => input.to_fahrenheit(),
+        TemperatureUnit::Fahrenheit(_) => input.to_celsius(),
     };
 
-    println!("That equals {} {}", result.amount(), result.name());
+    println!("That equals {result}");
 
 
     Ok(())
