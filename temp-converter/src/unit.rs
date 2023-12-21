@@ -31,8 +31,8 @@ impl TemperatureUnit {
 impl Display for TemperatureUnit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 	match self {
-	    TemperatureUnit::Celsius(amount) => write!(f, "{}C", amount),
-	    TemperatureUnit::Fahrenheit(amount) => write!(f, "{}F", amount),
+	    TemperatureUnit::Celsius(amount) => write!(f, "{:.2}C", amount),
+	    TemperatureUnit::Fahrenheit(amount) => write!(f, "{:.2}F", amount),
 	}
     }
 }
