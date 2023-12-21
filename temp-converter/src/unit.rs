@@ -46,19 +46,20 @@ pub struct ParseTemperatureUnitError {}
     type Err = ParseTemperatureUnitError;
     
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-	static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?P<amount>\d+\.?\d*)(?P<unit>C|F)").expect("Wrong TemperatureUnit regex"));
+	static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?P<amount>\d+\.?\d*)(?P<unit>C|F)")
+					   .expect("Wrong TemperatureUnit regex"));
 
-	// TODO: Can I make this nicer?
-	if let Some(captures) = RE.captures(s) {
-	    let amount = captures["amount"].parse::<f64>()
-		.or_else(|_| Err(ParseTemperatureUnitError{}))?;
-	    match &captures["unit"] {
-		"C" => Ok(TemperatureUnit::Celsius(amount)),
-		"F" => Ok(TemperatureUnit::Fahrenheit(amount)),
-		_ => Err(ParseTemperatureUnitError {}),
-	    }
-	} else {
-	    Err(ParseTemperatureUnitError {})
+	let Some(captures) = RE.captures(s) else {
+	    return Err(ParseTemperatureUnitError {})
+	};
+	
+	
+	let amount = captures["amount"].parse::<f64>()
+	    .or_else(|_| Err(ParseTemperatureUnitError{}))?;
+	match &captures["unit"] {
+	    "C" => Ok(TemperatureUnit::Celsius(amount)),
+	    "F" => Ok(TemperatureUnit::Fahrenheit(amount)),
+	    _ => Err(ParseTemperatureUnitError {}),
 	}
 
     }
