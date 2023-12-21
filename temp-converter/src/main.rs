@@ -9,6 +9,7 @@ use unit::TemperatureUnit;
 
 const INPUT_ERROR_MESSAGE: &str = "You must provide an input amount and unit. Examples: 32Cº, 45F";
 
+// TODO: Maybe also accept input from stdin if args are empty?
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
