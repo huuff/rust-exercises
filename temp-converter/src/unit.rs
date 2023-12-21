@@ -2,6 +2,7 @@ use std::{str::FromStr, fmt::Display};
 use once_cell::sync::Lazy;
 use regex::Regex;
 
+#[derive(PartialEq, Debug)]
 pub enum TemperatureUnit {
     Celsius(f64),
     Fahrenheit(f64),
@@ -9,6 +10,7 @@ pub enum TemperatureUnit {
 
 impl TemperatureUnit {
 
+    // TODO Test both of these
     pub fn to_celsius(self) -> TemperatureUnit {
 	match self {
 	    TemperatureUnit::Celsius(_) => self,
@@ -28,7 +30,6 @@ impl TemperatureUnit {
     }
 }
 
-// TODO: Test
 impl Display for TemperatureUnit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 	match self {
@@ -62,5 +63,31 @@ pub struct ParseTemperatureUnitError {}
 	    _ => Err(ParseTemperatureUnitError {}),
 	}
 
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn parse_celsius_integer() {
+       let result = "3C".parse::<TemperatureUnit>(); 
+
+	assert_eq!(result, Ok(TemperatureUnit::Celsius(3.0)));
+    }
+
+    #[test]
+    fn parse_fahrenheit_decimal() {
+	let result = "83.5F".parse::<TemperatureUnit>();
+
+	assert_eq!(result, Ok(TemperatureUnit::Fahrenheit(83.5)));
+    }
+
+    #[test]
+    fn parse_error() {
+	let result = "lol".parse::<TemperatureUnit>();
+
+	assert_eq!(result, Err(ParseTemperatureUnitError {  }))
     }
 }
