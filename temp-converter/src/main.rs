@@ -3,19 +3,14 @@ mod unit;
 use std::{
     env,
     error::Error,
-    process,
+    process, io::Write,
 };
-use unit::TemperatureUnit;
+use unit::{TemperatureUnit, ParseTemperatureUnitError};
 
 const INPUT_ERROR_MESSAGE: &str = "You must provide an input amount and unit. Examples: 32Cº, 45F";
 
-// TODO: Maybe also accept input from stdin if args are empty?
 fn main() -> Result<(), Box<dyn Error>> {
-    let args: Vec<String> = env::args().collect();
-
-    let Some(input) = &args.get(1) else { crash(INPUT_ERROR_MESSAGE); };
-
-    let Ok(input) = input.parse::<TemperatureUnit>() else { crash(INPUT_ERROR_MESSAGE); };
+    let Ok(input) = get_input() else { crash(INPUT_ERROR_MESSAGE); };
 
     println!("You entered {input}");
 
@@ -28,6 +23,28 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 
     Ok(())
+}
+
+fn get_input() -> Result<TemperatureUnit, ParseTemperatureUnitError> {
+    let args: Vec<String> = env::args().collect();
+
+    if let Some(input) = &args.get(1) {
+	input.parse::<TemperatureUnit>()
+    } else {
+	let mut input = String::new();
+
+	loop {
+	    print!("Enter your input unit (e.g. 80F or 35C): ");
+	    let _ = std::io::stdout().flush();
+	    if std::io::stdin().read_line(&mut input).is_ok() {
+		break;
+	    } else {
+		eprint!("Error processing input, please try again");
+	    }
+	}
+
+	input.parse::<TemperatureUnit>()
+    }
 }
 
 fn crash(message: &str) -> ! {
