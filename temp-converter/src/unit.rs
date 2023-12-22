@@ -10,7 +10,6 @@ pub enum TemperatureUnit {
 
 impl TemperatureUnit {
 
-    // TODO Test both of these
     pub fn to_celsius(self) -> TemperatureUnit {
 	match self {
 	    TemperatureUnit::Celsius(_) => self,
@@ -23,7 +22,7 @@ impl TemperatureUnit {
     pub fn to_fahrenheit(self) -> TemperatureUnit {
 	match self {
 	    TemperatureUnit::Celsius(amount) => {
-		TemperatureUnit::Fahrenheit((amount * 5.0/9.0) + 32.0)
+		TemperatureUnit::Fahrenheit((amount * 9.0/5.0) + 32.0)
 	    },
 	    TemperatureUnit::Fahrenheit(_) => self,
 	}
@@ -39,7 +38,6 @@ impl Display for TemperatureUnit {
     }
 }
 
-// TODO: Test
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseTemperatureUnitError {}
 
@@ -89,5 +87,26 @@ mod tests {
 	let result = "lol".parse::<TemperatureUnit>();
 
 	assert_eq!(result, Err(ParseTemperatureUnitError {  }))
+    }
+
+    #[test]
+    fn celsius_to_celsius() {
+	let input = TemperatureUnit::Celsius(35.0);
+
+	assert_eq!(input.to_celsius(), TemperatureUnit::Celsius(35.0));
+    }
+
+    #[test]
+    fn celsius_to_fahrenheit() {
+	let input = TemperatureUnit::Celsius(35.0);
+
+	assert_eq!(input.to_fahrenheit(), TemperatureUnit::Fahrenheit(95.0));
+    }
+
+    #[test]
+    fn fahrenheit_to_celsius() {
+	let input = TemperatureUnit::Fahrenheit(95.0);
+
+	assert_eq!(input.to_celsius(), TemperatureUnit::Celsius(35.0));
     }
 }
