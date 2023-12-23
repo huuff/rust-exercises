@@ -4,14 +4,14 @@ use itertools::Itertools;
 
 pub struct Stats {
     pub median: f64,
-    pub mode: Option<u32>,
+    pub mode: Vec<u32>,
 }
 
 impl Stats {
     pub fn from(input: &Vec<u32>) -> Self {
 	Self {
 	    median: calculate_median(&input),
-	    mode: calculate_mode(&input),
+	    mode: calculate_modes(&input),
 	}
     }
 }
@@ -36,10 +36,7 @@ fn calculate_median(input: &Vec<u32>) -> f64 {
     }
 }
 
-// TODO: Not entrely correct, this gives a single value with the most occurences,
-// but what if there are several with the same amount of occurences? Then it'd be a
-// multimodal distribution and we should return several modes
-fn calculate_mode(input: &Vec<u32>) -> Option<u32> {
+fn calculate_modes(input: &Vec<u32>) -> Vec<u32> {
     let mut occurrences: HashMap<u32, u32> = HashMap::new();
 
     for n in input {
@@ -47,12 +44,17 @@ fn calculate_mode(input: &Vec<u32>) -> Option<u32> {
 	*n_occurrences += 1;
     }
 
-    occurrences.into_iter().max_by_key(|it| (*it).1).map(|it| it.0)
+    occurrences.into_iter()
+	.max_set_by_key(|it| (*it).1)
+	.into_iter()
+	.map(|it| it.0)
+	.collect_vec()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use assertor::*;
     
     #[test]
     fn odd_median() {
@@ -72,13 +74,20 @@ mod tests {
     fn finds_mode() {
 	let input = vec![1, 2, 3, 2, 5, 3, 2];
 
-	assert_eq!(calculate_mode(&input), Some(2));
+	assert_eq!(calculate_modes(&input), vec![2]);
     }
 
     #[test]
     fn doesnt_find_mode() {
 	let input = vec![];
 
-	assert_eq!(calculate_mode(&input), None);
+	assert_eq!(calculate_modes(&input), vec![]);
+    }
+
+    #[test]
+    fn finds_many_modes() {
+	let input = vec![1, 2, 3, 4, 5];
+
+	assert_that!(calculate_modes(&input)).contains_exactly(&input)
     }
 }
