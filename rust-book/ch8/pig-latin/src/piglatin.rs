@@ -42,6 +42,8 @@ fn is_vowel(byte: &u8) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Stderr;
+
     use super::*;
     
     #[test]
@@ -66,5 +68,22 @@ mod tests {
 	let mut input = vec![b'a', b'd', b'i', b'o', b's'];
 
 	assert_eq!(piglatinize_word(&mut input), "adios-hay");
+    }
+
+    // TODO: This doesn't work because there's no whitespace at the end of the string, fix the function
+    // so it also works with the end of buffer
+    #[test]
+    fn correctly_piglatinizes() {
+	let input_string = String::from("hi how are you");
+	let mut input = BufReader::new(input_string.as_bytes());
+	let mut output_buffer = vec![];
+	let mut output = BufWriter::new(&mut output_buffer);
+
+	let result = piglatinize(&mut input, &mut output);
+	// TODO: Lol, any better way?
+	drop(output);
+
+	assert!(result.is_ok());
+	assert_eq!(String::from_utf8(output_buffer).unwrap(), String::from("i-hay ow-hay re-hay ou-yay"));
     }
 }
