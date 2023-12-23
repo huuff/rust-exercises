@@ -1,6 +1,7 @@
 use std::io::{BufReader, self, Read};
 
 // TODO: Make it write to a generic output buffer rather than stdout!
+// TODO: And this way, I can test it
 fn main() {
     let reader = BufReader::new(io::stdin());
 
