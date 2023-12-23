@@ -36,7 +36,7 @@ fn calculate_median(input: &Vec<u32>) -> f64 {
     }
 }
 
-// XXX: Not entrely correct, this gives a single value with the most occurences,
+// TODO: Not entrely correct, this gives a single value with the most occurences,
 // but what if there are several with the same amount of occurences? Then it'd be a
 // multimodal distribution and we should return several modes
 fn calculate_mode(input: &Vec<u32>) -> Option<u32> {
