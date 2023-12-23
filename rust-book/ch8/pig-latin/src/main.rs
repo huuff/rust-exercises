@@ -2,6 +2,7 @@ use std::io::{BufReader, self, Read};
 
 // TODO: Make it write to a generic output buffer rather than stdout!
 // TODO: And this way, I can test it
+// TODO: Also let it take a generic buffer!
 fn main() {
     let reader = BufReader::new(io::stdin());
 
