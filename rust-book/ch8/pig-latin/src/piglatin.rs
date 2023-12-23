@@ -1,6 +1,25 @@
+use std::io::{Read, BufWriter, Write, BufReader, self};
 
+// TODO: Test it!
+pub fn piglatinize<W: Write, R: Read>(reader: &mut BufReader<R>, writer: &mut BufWriter<W>) -> Result<(), io::Error> {
+    let mut current_word_buffer = Vec::new();
+    for byte in reader.bytes() {
+	let byte = byte?;
 
-pub fn piglatinize_word(word: &mut Vec<u8>) -> String {
+	if (byte as char).is_ascii_whitespace()  {
+	    let pig_latin_word = piglatinize_word(&mut current_word_buffer);
+	    write!(writer, "{pig_latin_word}")?;
+	    write!(writer, "{}", byte as char)?;
+	    current_word_buffer.clear();
+	} else {
+	    current_word_buffer.push(byte);
+	}
+    }
+
+    Ok(())
+}
+
+fn piglatinize_word(word: &mut Vec<u8>) -> String {
     if word.is_empty() { return "".to_string() } 
 
     let first_letter = word[0];
