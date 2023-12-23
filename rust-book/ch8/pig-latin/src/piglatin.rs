@@ -12,6 +12,7 @@ pub fn piglatinize_word(word: &mut Vec<u8>) -> String {
     }
 }
 
+// TODO: Rename this to vowel lol
 const VOCALS: [u8; 10] = [
     b'a', b'e', b'i', b'o', b'u',
     b'A', b'E', b'I', b'O', b'U',
@@ -32,5 +33,19 @@ mod tests {
     #[test]
     fn detects_nonvocal() {
 	assert_eq!(is_vocal(&b'n'), false);
+    }
+
+    #[test]
+    fn latinizes_with_consonant() {
+	let mut input = vec![b'p', b'a', b'c', b'o'];
+
+	assert_eq!(piglatinize_word(&mut input), "aco-pay");
+    }
+
+    #[test]
+    fn latinizes_with_vowel() {
+	let mut input = vec![b'a', b'd', b'i', b'o', b's'];
+
+	assert_eq!(piglatinize_word(&mut input), "adios-hay");
     }
 }
