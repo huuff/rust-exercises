@@ -19,3 +19,18 @@ const VOCALS: [u8; 10] = [
 fn is_vocal(byte: &u8) -> bool {
     VOCALS.contains(&byte)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn detects_vocal() {
+       assert_eq!(is_vocal(&b'a'), true); 
+    }
+
+    #[test]
+    fn detects_nonvocal() {
+	assert_eq!(is_vocal(&b'n'), false);
+    }
+}
