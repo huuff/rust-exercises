@@ -40,18 +40,11 @@ impl App {
     }
 
     pub fn toggle_editing(&mut self) {
-	if let Some(edit_mode) = &self.currently_editing {
-	    match edit_mode {
-		CurrentlyEditing::Key => {
-		    self.currently_editing = Some(CurrentlyEditing::Value)
-		}
-		CurrentlyEditing::Value => {
-		    self.currently_editing = Some(CurrentlyEditing::Key)
-		}
-	    }
-	} else {
-	    self.currently_editing = Some(CurrentlyEditing::Key)
-	}
+	self.currently_editing = match &self.currently_editing {
+	    None => Some(CurrentlyEditing::Key),
+	    Some(CurrentlyEditing::Key) => Some(CurrentlyEditing::Value),
+	    Some(CurrentlyEditing::Value) => Some(CurrentlyEditing::Key),
+	};
     }
 
     pub fn print_json(&self) -> anyhow::Result<()> {
