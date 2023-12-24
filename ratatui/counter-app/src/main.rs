@@ -1,34 +1,83 @@
 use std::io;
+use anyhow::Result;
+use crossterm::{
+    event::{self, Event::Key, KeyCode::Char},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
+use ratatui::{
+    prelude::{CrosstermBackend, Terminal, Frame},
+    widgets::Paragraph,
+};
 
-use ratatui::{Terminal, backend::CrosstermBackend, widgets::Paragraph};
-use crossterm::event::{self, KeyCode};
+struct App {
+    counter: i64,
+    should_quit: bool,
+}
 
-fn main() -> io::Result<()> {
-    crossterm::terminal::enable_raw_mode()?;
-    crossterm::execute!(io::stderr(), crossterm::terminal::EnterAlternateScreen)?;
+impl App {
+    fn new() -> Self {
+	App { counter: 0, should_quit: false }
+    }
+}
 
-    let mut terminal = Terminal::new(CrosstermBackend::new(io::stderr()))?;
+fn main() -> Result<()> {
+    startup()?;
+    let status = run();
+    shutdown()?;
+    status?;
+    Ok(())
+}
 
-    let mut counter = 0;
+fn run() -> Result<()> {
+    let mut t = Terminal::new(CrosstermBackend::new(io::stderr()))?;
+
+    let mut app = App::new();
+
     loop {
-	terminal.draw(|f| {
-	    f.render_widget(Paragraph::new(format!("Counter: {counter}")), f.size());
-	})?;
+	t.draw(|f| ui(&app, f))?;
 
-	if event::poll(std::time::Duration::from_millis(250))? {
-	    if let event::Event::Key(key) = event::read()? {
-		match key.code {
-		    KeyCode::Char('j') => counter += 1,
-		    KeyCode::Char('k') => counter -= 1,
-		    KeyCode::Char('q') => break,
-		    _ => {},
-		};
-	    };
+	update(&mut app)?;
+
+	if app.should_quit {
+	    break;
 	}
     }
 
-    crossterm::execute!(io::stderr(), crossterm::terminal::LeaveAlternateScreen)?;
-    crossterm::terminal::disable_raw_mode()?;
+    Ok(())
+}
+
+
+fn startup() -> Result<()> {
+    enable_raw_mode()?;
+    execute!(io::stderr(), EnterAlternateScreen)?;
+    Ok(())
+}
+
+fn shutdown() -> Result<()> {
+    execute!(io::stderr(), LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+    Ok(())
+}
+
+fn ui(app: &App, f: &mut Frame) {
+    f.render_widget(Paragraph::new(format!("Counter: {}", app.counter)), f.size());
+}
+
+fn update(app: &mut App) -> Result<()> {
+    if event::poll(std::time::Duration::from_millis(250))? {
+	if let Key(key) = event::read()? {
+	    if key.kind == event::KeyEventKind::Press {
+		match key.code {
+		    Char('j') => app.counter += 1,
+		    Char('k') => app.counter -= 1,
+		    Char('q') => app.should_quit = true,
+		    _ => {},
+		}
+	    }
+	}
+    }
+
 
     Ok(())
 }
