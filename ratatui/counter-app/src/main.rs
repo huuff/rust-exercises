@@ -25,10 +25,10 @@ fn main() -> anyhow::Result<()> {
 
     while !app.should_quit {
 	// Render the user interface
-	tui.draw(&mut app)?;
+	// tui.draw(&mut app)?;
 
 	match tui.events.next()? {
-	    Event::Tick => {},
+	    Event::Tick => tui.draw(&mut app)?,
 	    Event::Key(key_event) => update(&mut app, key_event),
 	    Event::Mouse(_) => {}
 	    Event::Resize(_, _) => {}
