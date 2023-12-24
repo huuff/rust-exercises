@@ -1,83 +1,40 @@
+
+pub mod app;
+pub mod event;
+pub mod ui;
+pub mod tui;
+pub mod update;
+
+use app::App;
+use event::{Event, EventHandler};
+use ratatui::{backend::CrosstermBackend, Terminal};
+use tui::Tui;
+use update::update;
 use std::io;
-use anyhow::Result;
-use crossterm::{
-    event::{self, Event::Key, KeyCode::Char},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-};
-use ratatui::{
-    prelude::{CrosstermBackend, Terminal, Frame},
-    widgets::Paragraph,
-};
 
-struct App {
-    counter: i64,
-    should_quit: bool,
-}
-
-impl App {
-    fn new() -> Self {
-	App { counter: 0, should_quit: false }
-    }
-}
-
-fn main() -> Result<()> {
-    startup()?;
-    let status = run();
-    shutdown()?;
-    status?;
-    Ok(())
-}
-
-fn run() -> Result<()> {
-    let mut t = Terminal::new(CrosstermBackend::new(io::stderr()))?;
-
+fn main() -> anyhow::Result<()> {
+    // Create an application
     let mut app = App::new();
 
-    loop {
-	t.draw(|f| ui(&app, f))?;
+    // Initialize the terminal user interface
+    let backend = CrosstermBackend::new(io::stderr());
+    let terminal = Terminal::new(backend)?;
+    let events = EventHandler::new(250);
+    let mut tui = Tui::new(terminal, events);
+    tui.enter()?;
 
-	update(&mut app)?;
+    while !app.should_quit {
+	// Render the user interface
+	tui.draw(&mut app)?;
 
-	if app.should_quit {
-	    break;
+	match tui.events.next()? {
+	    Event::Tick => {},
+	    Event::Key(key_event) => update(&mut app, key_event),
+	    Event::Mouse(_) => {}
+	    Event::Resize(_, _) => {}
 	}
     }
 
-    Ok(())
-}
-
-
-fn startup() -> Result<()> {
-    enable_raw_mode()?;
-    execute!(io::stderr(), EnterAlternateScreen)?;
-    Ok(())
-}
-
-fn shutdown() -> Result<()> {
-    execute!(io::stderr(), LeaveAlternateScreen)?;
-    disable_raw_mode()?;
-    Ok(())
-}
-
-fn ui(app: &App, f: &mut Frame) {
-    f.render_widget(Paragraph::new(format!("Counter: {}", app.counter)), f.size());
-}
-
-fn update(app: &mut App) -> Result<()> {
-    if event::poll(std::time::Duration::from_millis(250))? {
-	if let Key(key) = event::read()? {
-	    if key.kind == event::KeyEventKind::Press {
-		match key.code {
-		    Char('j') => app.counter += 1,
-		    Char('k') => app.counter -= 1,
-		    Char('q') => app.should_quit = true,
-		    _ => {},
-		}
-	    }
-	}
-    }
-
-
+    tui.exit()?;
     Ok(())
 }
