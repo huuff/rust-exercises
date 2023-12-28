@@ -9,6 +9,7 @@ use crossterm::{
 use ratatui::{backend::{CrosstermBackend, Backend}, Terminal};
 use std::io;
 use app::{App, CurrentScreen, CurrentlyEditing};
+use ui::ui;
 
 fn main() -> anyhow::Result<()> {
     // setup terminal
