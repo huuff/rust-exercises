@@ -1,8 +1,9 @@
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    style::{Style, Color},
+    style::{Color, Style},
+    text::Text,
     widgets::{Block, Borders, Paragraph},
-    Frame, text::Text,
+    Frame,
 };
 
 use crate::app::App;
@@ -22,10 +23,10 @@ pub fn ui(f: &mut Frame, app: &App) {
         .style(Style::default());
 
     let title = Paragraph::new(Text::styled(
-	"Create New Json",
-	Style::default().fg(Color::Green),
+        "Create New Json",
+        Style::default().fg(Color::Green),
     ))
-	.block(title_block);
+    .block(title_block);
 
     f.render_widget(title, chunks[0]);
 }
