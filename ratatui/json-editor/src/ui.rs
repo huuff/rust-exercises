@@ -9,7 +9,7 @@ use ratatui::{
 use crate::app::{App, CurrentScreen, CurrentlyEditing};
 
 pub fn ui(f: &mut Frame, app: &App) {
-    let chunks = Layout::default()
+    let main_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(3),
@@ -18,6 +18,14 @@ pub fn ui(f: &mut Frame, app: &App) {
         ])
         .split(f.size());
 
+    render_header(f, app, main_layout[0]);
+
+    render_body(f, app, main_layout[1]);
+
+    render_footer(f, &app, main_layout[2]);
+}
+
+fn render_header(f: &mut Frame, app: &App, target_area: Rect) {
     let title_block = Block::default()
         .borders(Borders::ALL)
         .style(Style::default());
@@ -28,8 +36,10 @@ pub fn ui(f: &mut Frame, app: &App) {
     ))
     .block(title_block);
 
-    f.render_widget(title, chunks[0]);
+    f.render_widget(title, target_area);
+}
 
+fn render_body(f: &mut Frame, app: &App, target_area: Rect) {
     // TODO: Refactor to a .map
     let mut list_items = Vec::<ListItem>::new();
 
@@ -41,11 +51,10 @@ pub fn ui(f: &mut Frame, app: &App) {
     }
 
     let list = List::new(list_items);
+    f.render_widget(list, target_area);
+}
 
-    f.render_widget(list, chunks[1]);
-
-    // TODO: Most of the below's code is for rendring the footer, we could extract it
-    // to a different function
+fn render_footer(f: &mut Frame, app: &App, target_area: Rect) {
     let current_navigation_text = vec![
         // The first half of the text
         match app.current_screen {
@@ -93,7 +102,7 @@ pub fn ui(f: &mut Frame, app: &App) {
     let footer_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
-        .split(chunks[2]);
+        .split(target_area);
 
     f.render_widget(mode_footer, footer_chunks[0]);
     f.render_widget(key_notes_footer, footer_chunks[1]);
