@@ -50,17 +50,12 @@ fn render_header(f: &mut Frame, target_area: Rect) {
 }
 
 fn render_body(f: &mut Frame, app: &App, target_area: Rect) {
-    // TODO: Refactor to a .map
-    let mut list_items = Vec::<ListItem>::new();
-
-    for key in app.pairs.keys() {
-        list_items.push(ListItem::new(Line::from(Span::styled(
-            format!("{: <25}: {}", key, app.pairs[key]),
-            Style::default().fg(Color::Yellow),
-        ))))
-    }
-
-    let list = List::new(list_items);
+    let list = List::new(
+	app.pairs.keys().map(|k| ListItem::new(Line::from(Span::styled(
+	    format!("{: <25}: {}", k, app.pairs[k]),
+	    Style::default().fg(Color::Yellow),
+	))))
+    );
     f.render_widget(list, target_area);
 }
 
