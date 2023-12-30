@@ -1,14 +1,18 @@
+mod event;
+
+use event::{Event, EventHandler};
 use std::io;
-use time::{ext::NumericalDuration, Instant, Duration};
+use time::{Duration, Instant};
 
 use crossterm::{
+    event::KeyCode,
     terminal::{disable_raw_mode, enable_raw_mode},
-    event::{self, KeyEventKind, KeyCode, KeyEvent},
 };
 use ratatui::{
     backend::CrosstermBackend,
-    widgets::{Block, Borders, Paragraph, block::Position},
-    Frame, Terminal, TerminalOptions, Viewport, layout::Alignment,
+    layout::Alignment,
+    widgets::{block::Position, Block, Borders, Paragraph},
+    Frame, Terminal, TerminalOptions, Viewport,
 };
 
 fn main() -> anyhow::Result<()> {
@@ -21,21 +25,22 @@ fn main() -> anyhow::Result<()> {
     )?;
 
     let start_time = Instant::now();
+    let event_handler = EventHandler::new(250);
+    terminal.draw(|f| ui(f, start_time.elapsed()))?;
 
     loop {
-	let elapsed_time = Instant::now() - start_time;
-        terminal.draw(|f| ui(f, elapsed_time))?;
-
-	if event::poll(66.milliseconds().try_into()?)? {
-	    if let event::Event::Key(KeyEvent { kind, code, ..}) = event::read()? {
-		if kind != KeyEventKind::Press { continue; }
-
-		match code {
-		    KeyCode::Char('q') => { break; },
-		    _ => {}
-		}
-	    }
-	}
+        match event_handler.next()? {
+            Event::Tick => {
+                terminal.draw(|f| ui(f, start_time.elapsed()))?;
+            }
+            Event::Key(key_event) => match key_event.code {
+                KeyCode::Char('q') => {
+                    break;
+                }
+                _ => {}
+            },
+            _ => {}
+        };
     }
 
     disable_raw_mode()?;
@@ -44,14 +49,13 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn ui(f: &mut Frame, elapsed_time: Duration) {
-    let p = Paragraph::new(format!("Hello World. {}s", elapsed_time.whole_seconds()))
-	.block(Block::default()
-	       .borders(Borders::ALL)
-	       .title("Press q to exit")
-	       .title_position(Position::Bottom)
-	       .title_alignment(Alignment::Right)
-	)
-	;
+    let p = Paragraph::new(format!("Hello World. {}s", elapsed_time.whole_seconds())).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("Press q to exit")
+            .title_position(Position::Bottom)
+            .title_alignment(Alignment::Right),
+    );
 
     f.render_widget(p, f.size());
 }
