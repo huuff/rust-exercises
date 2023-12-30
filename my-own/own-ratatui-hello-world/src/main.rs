@@ -6,8 +6,8 @@ use crossterm::{
 };
 use ratatui::{
     backend::CrosstermBackend,
-    widgets::{Block, Borders, Paragraph},
-    Frame, Terminal, TerminalOptions, Viewport,
+    widgets::{Block, Borders, Paragraph, block::Position},
+    Frame, Terminal, TerminalOptions, Viewport, layout::Alignment,
 };
 
 fn main() -> anyhow::Result<()> {
@@ -40,7 +40,14 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn ui(f: &mut Frame) {
-    let p = Paragraph::new("Hello World").block(Block::default().borders(Borders::ALL));
+    let p = Paragraph::new("Hello World")
+	.block(Block::default()
+	       .borders(Borders::ALL)
+	       .title("Press q to exit")
+	       .title_position(Position::Bottom)
+	       .title_alignment(Alignment::Right)
+	)
+	;
 
     f.render_widget(p, f.size());
 }
