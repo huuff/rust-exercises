@@ -1,8 +1,9 @@
 mod app;
 mod event;
 mod util;
+mod constants;
 
-use std::{io, ops::AddAssign};
+use std::io;
 
 use app::App;
 use crossterm::{
@@ -41,7 +42,7 @@ fn main() -> anyhow::Result<()> {
                 match key.code {
                     KeyCode::Char(c) => {
 			if c.is_digit(10) {
-			    app.input.push(c)
+			    app.add_to_input(c);
 			}
 
 			if c == 'q' {
@@ -76,7 +77,8 @@ fn ui(f: &mut Frame, app: &App) {
         Direction::Horizontal,
         [
             Constraint::Min(0),
-            Constraint::Length(20),
+	    // max size of the input plus 2 for the block borders
+            Constraint::Length(constants::MAX_INPUT_SIZE as u16 + 2),
             Constraint::Min(0),
         ],
     )
