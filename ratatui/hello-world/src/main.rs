@@ -13,7 +13,7 @@ use ratatui::{
 use std::io::{stdout, Result};
 
 fn main() -> Result<()> {
-   stdout().execute(EnterAlternateScreen)?; 
+    stdout().execute(EnterAlternateScreen)?; 
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
