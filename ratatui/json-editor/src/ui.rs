@@ -18,40 +18,24 @@ pub fn ui(f: &mut Frame, app: &App) {
         ])
         .split(f.size());
 
-    render_header(f, app, main_layout[0]);
+    render_header(f, main_layout[0]);
 
     render_body(f, app, main_layout[1]);
 
     render_footer(f, &app, main_layout[2]);
 
     if let Some(editing) = &app.currently_editing {
-        render_edit_popup(f, app, editing)
+        render_edit_popup(f, app, editing);
     }
-
-    // TODO: Put this somewhere else (render_exit_popup?)
 
     if app.current_screen == CurrentScreen::Exiting {
-        f.render_widget(Clear, f.size());
-        let popup_block = Block::default()
-            .title("Y/N")
-            .borders(Borders::NONE)
-            .style(Style::default().bg(Color::DarkGray));
-
-        let exit_text = Text::styled(
-            "Would you like to output the buffer as json? (y/n)",
-            Style::default().fg(Color::Red),
-        );
-
-        let exit_paragraph = Paragraph::new(exit_text)
-            .block(popup_block)
-            .wrap(Wrap { trim: false });
-
-        let area = centered_rect(60, 25, f.size());
-        f.render_widget(exit_paragraph, area);
+	render_exit_popup(f);
     }
+
+
 }
 
-fn render_header(f: &mut Frame, app: &App, target_area: Rect) {
+fn render_header(f: &mut Frame, target_area: Rect) {
     let title_block = Block::default()
         .borders(Borders::ALL)
         .style(Style::default());
@@ -164,6 +148,26 @@ fn render_edit_popup(f: &mut Frame, app: &App, editing: &CurrentlyEditing) {
 
     let value_text = Paragraph::new(app.value_input.clone()).block(value_block);
     f.render_widget(value_text, popup_chunks[1]);
+}
+
+fn render_exit_popup(f: &mut Frame) {
+    f.render_widget(Clear, f.size());
+    let popup_block = Block::default()
+	.title("Y/N")
+	.borders(Borders::NONE)
+	.style(Style::default().bg(Color::DarkGray));
+
+    let exit_text = Text::styled(
+        "Would you like to output the buffer as json? (y/n)",
+        Style::default().fg(Color::Red),
+    );
+
+    let exit_paragraph = Paragraph::new(exit_text)
+        .block(popup_block)
+        .wrap(Wrap { trim: false });
+
+    let area = centered_rect(60, 25, f.size());
+    f.render_widget(exit_paragraph, area);
 }
 
 /// helper function to create a centered rect using up certain percentage of the available rect `r`
