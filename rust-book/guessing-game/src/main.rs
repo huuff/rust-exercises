@@ -2,8 +2,9 @@ mod app;
 mod event;
 mod util;
 
-use std::io;
+use std::{io, ops::AddAssign};
 
+use app::App;
 use crossterm::{
     event::KeyCode,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -14,9 +15,9 @@ use ratatui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout, SegmentSize},
     widgets::{Block, Borders, Paragraph},
-    Frame, Terminal, TerminalOptions, Viewport,
+    Frame, Terminal, TerminalOptions, Viewport, text::Text,
 };
-use util::centered_rect;
+
 
 fn main() -> anyhow::Result<()> {
     enable_raw_mode()?;
@@ -27,18 +28,25 @@ fn main() -> anyhow::Result<()> {
             viewport: Viewport::Fullscreen,
         },
     )?;
-
+   
+    let mut app = App::new();
     let event_handler = EventHandler::new(16);
 
     loop {
         match event_handler.next()? {
             Event::Tick => {
-                terminal.draw(ui)?;
+                terminal.draw(|f| ui(f, &app))?;
             }
             Event::Key(key) => {
                 match key.code {
-                    KeyCode::Char('q') => {
-                        break;
+                    KeyCode::Char(c) => {
+			if c.is_digit(10) {
+			    app.input.push(c)
+			}
+
+			if c == 'q' {
+			    break;
+			}
                     }
                     _ => {}
                 };
@@ -52,7 +60,8 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn ui(f: &mut Frame) {
+// TODO: In a separate ui module
+fn ui(f: &mut Frame, app: &App) {
     let vertical_layout = Layout::new(
         Direction::Vertical,
         [
@@ -75,8 +84,10 @@ fn ui(f: &mut Frame) {
 
     let middle_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
     
-    let input_block = Block::default()
-        .borders(Borders::ALL)
-        .title("Enter your guess");
-    f.render_widget(input_block, middle_rect);
+    let input = Paragraph::new(Text::raw(&app.input))
+        .block(Block::default()
+	    .borders(Borders::ALL)
+	    .title("Enter your guess")
+	);
+    f.render_widget(input, middle_rect);
 }
