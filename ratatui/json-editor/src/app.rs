@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+#[derive(PartialEq, Eq)]
 pub enum CurrentScreen {
     Main,
     Editing,

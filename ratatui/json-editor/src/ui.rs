@@ -2,7 +2,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, List, ListItem, Paragraph},
+    widgets::{Block, Borders, List, ListItem, Paragraph, Clear, Wrap},
     Frame,
 };
 
@@ -23,6 +23,8 @@ pub fn ui(f: &mut Frame, app: &App) {
     render_body(f, app, main_layout[1]);
 
     render_footer(f, &app, main_layout[2]);
+
+    // TODO: Put this somewhere else (render_edit_popup?)
 
     if let Some(editing) = &app.currently_editing {
 	let popup_block = Block::default()
@@ -57,9 +59,31 @@ pub fn ui(f: &mut Frame, app: &App) {
 
 	let value_text = Paragraph::new(app.value_input.clone()).block(value_block);
 	f.render_widget(value_text, popup_chunks[1]);
+    }
+
+	// TODO: Put this somewhere else (render_exit_popup?)
+
+	if app.current_screen == CurrentScreen::Exiting {
+	    f.render_widget(Clear, f.size());
+	    let popup_block = Block::default()
+		.title("Y/N")
+		.borders(Borders::NONE)
+		.style(Style::default().bg(Color::DarkGray));
+
+	    let exit_text = Text::styled(
+		"Would you like to output the buffer as json? (y/n)",
+		Style::default().fg(Color::Red),
+	    );
+
+	    let exit_paragraph = Paragraph::new(exit_text)
+		.block(popup_block)
+		.wrap(Wrap { trim: false });
+
+	    let area = centered_rect(60, 25, f.size());
+	    f.render_widget(exit_paragraph, area);
+	}
 	
     }
-}
 
 fn render_header(f: &mut Frame, app: &App, target_area: Rect) {
     let title_block = Block::default()
