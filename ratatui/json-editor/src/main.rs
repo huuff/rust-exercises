@@ -70,30 +70,23 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
 		},
 		CurrentScreen::Editing if key.kind == KeyEventKind::Press => {
 		    match key.code {
-			// TODO: Clean these... Can't we just put the if let inside the match?
 			KeyCode::Enter => {
-			    if let Some(editing) = &app.currently_editing {
-				match editing {
-				    CurrentlyEditing::Key => {
-					app.currently_editing = Some(CurrentlyEditing::Value);
-				    }
-				    CurrentlyEditing::Value => {
-					app.save_key_value();
-					app.current_screen = CurrentScreen::Main;
-				    }
+			    match &app.currently_editing {
+				Some(CurrentlyEditing::Key) => {
+				    app.currently_editing = Some(CurrentlyEditing::Value);
 				}
+				Some(CurrentlyEditing::Value) => {
+				    app.save_key_value();
+				    app.current_screen = CurrentScreen::Main;
+				}
+				None => {}
 			    }
 			}
 			KeyCode::Backspace => {
-			    if let Some(editing) = &app.currently_editing {
-				match editing {
-				    CurrentlyEditing::Key => {
-					app.key_input.pop();
-				    }
-				    CurrentlyEditing::Value => {
-					app.value_input.pop();
-				    }
-				}
+			    match &app.currently_editing {
+				Some(CurrentlyEditing::Key) => { app.key_input.pop(); }
+				Some(CurrentlyEditing::Value) => { app.value_input.pop(); }
+				None => {}
 			    }
 			}
 			KeyCode::Esc => {
@@ -104,15 +97,14 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
 			    app.toggle_editing();
 			}
 			KeyCode::Char(value) => {
-			    if let Some(editing) = &app.currently_editing {
-				match editing {
-				    CurrentlyEditing::Key => {
-					app.key_input.push(value);
-				    }
-				    CurrentlyEditing::Value => {
-					app.value_input.push(value);
-				    }
+			    match &app.currently_editing {
+				Some(CurrentlyEditing::Key) => {
+				    app.key_input.push(value);
 				}
+				Some(CurrentlyEditing::Value) => {
+				    app.value_input.push(value);
+				}
+				None => {}
 			    }
 			}
 			_ => {}
