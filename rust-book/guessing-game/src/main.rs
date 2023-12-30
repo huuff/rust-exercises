@@ -38,7 +38,7 @@ fn main() -> anyhow::Result<()> {
             Event::Tick => {
                 terminal.draw(|f| ui(f, &app))?;
             }
-	    // TODO: Maybe remove this key handling somewhere else
+	    // TODO: Maybe move this key handling somewhere else
             Event::Key(key) => {
                 match key.code {
                     KeyCode::Char(c) => {
