@@ -18,4 +18,8 @@ impl App {
 	    self.input.push(c);
 	}
     }
+
+    pub fn delete_from_input(&mut self) {
+	self.input.pop();
+    }
 }

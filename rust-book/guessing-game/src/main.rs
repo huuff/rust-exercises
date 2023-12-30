@@ -38,6 +38,7 @@ fn main() -> anyhow::Result<()> {
             Event::Tick => {
                 terminal.draw(|f| ui(f, &app))?;
             }
+	    // TODO: Maybe remove this key handling somewhere else
             Event::Key(key) => {
                 match key.code {
                     KeyCode::Char(c) => {
@@ -49,6 +50,9 @@ fn main() -> anyhow::Result<()> {
 			    break;
 			}
                     }
+		    KeyCode::Backspace => {
+			app.delete_from_input();
+		    }
                     _ => {}
                 };
             }
