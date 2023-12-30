@@ -1,4 +1,5 @@
-use std::{io, time::Duration};
+use std::io;
+use time::ext::NumericalDuration;
 
 use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode},
@@ -19,10 +20,11 @@ fn main() -> anyhow::Result<()> {
         },
     )?;
 
+
     loop {
         terminal.draw(ui)?;
 
-	if event::poll(Duration::from_millis(66))? {
+	if event::poll(66.milliseconds().try_into()?)? {
 	    if let event::Event::Key(KeyEvent { kind, code, ..}) = event::read()? {
 		if kind != KeyEventKind::Press { continue; }
 
