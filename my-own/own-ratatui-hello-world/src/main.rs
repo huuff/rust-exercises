@@ -1,5 +1,5 @@
 use std::io;
-use time::ext::NumericalDuration;
+use time::{ext::NumericalDuration, Instant, Duration};
 
 use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode},
@@ -20,9 +20,11 @@ fn main() -> anyhow::Result<()> {
         },
     )?;
 
+    let start_time = Instant::now();
 
     loop {
-        terminal.draw(ui)?;
+	let elapsed_time = Instant::now() - start_time;
+        terminal.draw(|f| ui(f, elapsed_time))?;
 
 	if event::poll(66.milliseconds().try_into()?)? {
 	    if let event::Event::Key(KeyEvent { kind, code, ..}) = event::read()? {
@@ -41,8 +43,8 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn ui(f: &mut Frame) {
-    let p = Paragraph::new("Hello World")
+fn ui(f: &mut Frame, elapsed_time: Duration) {
+    let p = Paragraph::new(format!("Hello World. {}s", elapsed_time.whole_seconds()))
 	.block(Block::default()
 	       .borders(Borders::ALL)
 	       .title("Press q to exit")
