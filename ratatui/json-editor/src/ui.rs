@@ -2,7 +2,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, List, ListItem, Paragraph, Clear, Wrap},
+    widgets::{Block, Borders, Clear, List, ListItem, Paragraph, Wrap},
     Frame,
 };
 
@@ -24,66 +24,32 @@ pub fn ui(f: &mut Frame, app: &App) {
 
     render_footer(f, &app, main_layout[2]);
 
-    // TODO: Put this somewhere else (render_edit_popup?)
-
     if let Some(editing) = &app.currently_editing {
-	let popup_block = Block::default()
-	    .title("Enter a new key-value pair")
-	    .borders(Borders::NONE)
-	    .style(Style::default().bg(Color::DarkGray));
-	
-	let area = centered_rect(60, 25, f.size());
-	f.render_widget(popup_block, area);
-
-	let popup_chunks = Layout::default()
-	    .direction(Direction::Horizontal)
-	    .margin(1)
-	    .constraints([
-		Constraint::Percentage(50),
-		Constraint::Percentage(50),
-	    ])
-	    .split(area);
-
-	let mut key_block = Block::default().title("Key").borders(Borders::ALL);
-	let mut value_block = Block::default().title("Value").borders(Borders::ALL);
-
-	let active_style = Style::default().bg(Color::LightYellow).fg(Color::Black);
-
-	match editing {
-	    CurrentlyEditing::Key => key_block = key_block.style(active_style),
-	    CurrentlyEditing::Value => value_block = value_block.style(active_style),
-	}
-
-	let key_text = Paragraph::new(app.key_input.clone()).block(key_block);
-	f.render_widget(key_text, popup_chunks[0]);
-
-	let value_text = Paragraph::new(app.value_input.clone()).block(value_block);
-	f.render_widget(value_text, popup_chunks[1]);
+        render_edit_popup(f, app, editing)
     }
 
-	// TODO: Put this somewhere else (render_exit_popup?)
+    // TODO: Put this somewhere else (render_exit_popup?)
 
-	if app.current_screen == CurrentScreen::Exiting {
-	    f.render_widget(Clear, f.size());
-	    let popup_block = Block::default()
-		.title("Y/N")
-		.borders(Borders::NONE)
-		.style(Style::default().bg(Color::DarkGray));
+    if app.current_screen == CurrentScreen::Exiting {
+        f.render_widget(Clear, f.size());
+        let popup_block = Block::default()
+            .title("Y/N")
+            .borders(Borders::NONE)
+            .style(Style::default().bg(Color::DarkGray));
 
-	    let exit_text = Text::styled(
-		"Would you like to output the buffer as json? (y/n)",
-		Style::default().fg(Color::Red),
-	    );
+        let exit_text = Text::styled(
+            "Would you like to output the buffer as json? (y/n)",
+            Style::default().fg(Color::Red),
+        );
 
-	    let exit_paragraph = Paragraph::new(exit_text)
-		.block(popup_block)
-		.wrap(Wrap { trim: false });
+        let exit_paragraph = Paragraph::new(exit_text)
+            .block(popup_block)
+            .wrap(Wrap { trim: false });
 
-	    let area = centered_rect(60, 25, f.size());
-	    f.render_widget(exit_paragraph, area);
-	}
-	
+        let area = centered_rect(60, 25, f.size());
+        f.render_widget(exit_paragraph, area);
     }
+}
 
 fn render_header(f: &mut Frame, app: &App, target_area: Rect) {
     let title_block = Block::default()
@@ -166,6 +132,38 @@ fn render_footer(f: &mut Frame, app: &App, target_area: Rect) {
 
     f.render_widget(mode_footer, footer_chunks[0]);
     f.render_widget(key_notes_footer, footer_chunks[1]);
+}
+
+fn render_edit_popup(f: &mut Frame, app: &App, editing: &CurrentlyEditing) {
+    let popup_block = Block::default()
+        .title("Enter a new key-value pair")
+        .borders(Borders::NONE)
+        .style(Style::default().bg(Color::DarkGray));
+
+    let area = centered_rect(60, 25, f.size());
+    f.render_widget(popup_block, area);
+
+    let popup_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .margin(1)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(area);
+
+    let mut key_block = Block::default().title("Key").borders(Borders::ALL);
+    let mut value_block = Block::default().title("Value").borders(Borders::ALL);
+
+    let active_style = Style::default().bg(Color::LightYellow).fg(Color::Black);
+
+    match editing {
+        CurrentlyEditing::Key => key_block = key_block.style(active_style),
+        CurrentlyEditing::Value => value_block = value_block.style(active_style),
+    }
+
+    let key_text = Paragraph::new(app.key_input.clone()).block(key_block);
+    f.render_widget(key_text, popup_chunks[0]);
+
+    let value_text = Paragraph::new(app.value_input.clone()).block(value_block);
+    f.render_widget(value_text, popup_chunks[1]);
 }
 
 /// helper function to create a centered rect using up certain percentage of the available rect `r`
