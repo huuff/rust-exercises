@@ -1,8 +1,8 @@
-use std::{io, thread, time::Duration};
+use std::{io, time::Duration};
 
 use crossterm::{
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-    ExecutableCommand, event::{self, KeyEventKind, KeyCode},
+    terminal::{disable_raw_mode, enable_raw_mode},
+    event::{self, KeyEventKind, KeyCode, KeyEvent},
 };
 use ratatui::{
     backend::CrosstermBackend,
@@ -11,7 +11,6 @@ use ratatui::{
 };
 
 fn main() -> anyhow::Result<()> {
-    // io::stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
     let mut terminal = Terminal::with_options(
         CrosstermBackend::new(io::stdout()),
@@ -23,17 +22,18 @@ fn main() -> anyhow::Result<()> {
     loop {
         terminal.draw(ui)?;
 
-        // thread::sleep(Duration::from_millis(66));
 	if event::poll(Duration::from_millis(66))? {
-	    if let event::Event::Key(key) = event::read()? {
-		if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
-		    break;
+	    if let event::Event::Key(KeyEvent { kind, code, ..}) = event::read()? {
+		if kind != KeyEventKind::Press { continue; }
+
+		match code {
+		    KeyCode::Char('q') => { break; },
+		    _ => {}
 		}
 	    }
 	}
     }
 
-    io::stdout().execute(LeaveAlternateScreen)?;
     disable_raw_mode()?;
 
     Ok(())
