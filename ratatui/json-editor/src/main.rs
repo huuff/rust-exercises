@@ -29,13 +29,10 @@ fn main() -> anyhow::Result<()> {
     execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
     terminal.show_cursor()?;
 
-    // TODO: Simplify this a little
-    if let Ok(do_print) = res {
-	if do_print {
-	    app.print_json()?;
-	}
-    } else if let Err(err) = res {
-	println!("{err:?}");
+    match res {
+	Ok(true) => app.print_json()?,
+	Err(err) => println!("{err:?}"),
+	_ => {}
     }
 
     Ok(())
