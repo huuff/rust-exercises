@@ -5,7 +5,7 @@ mod constants;
 
 use std::io;
 
-use app::App;
+use app::{App, LastGuessDirection};
 use crossterm::{
     event::KeyCode,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -16,7 +16,7 @@ use ratatui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout, SegmentSize},
     widgets::{Block, Borders, Paragraph},
-    Frame, Terminal, TerminalOptions, Viewport, text::Text,
+    Frame, Terminal, TerminalOptions, Viewport, text::Text, style::{Style, Color},
 };
 
 
@@ -50,6 +50,9 @@ fn main() -> anyhow::Result<()> {
 			    break;
 			}
                     }
+		    KeyCode::Enter => {
+			app.submit_guess();
+		    }
 		    KeyCode::Backspace => {
 			app.delete_from_input();
 		    }
@@ -72,6 +75,7 @@ fn ui(f: &mut Frame, app: &App) {
         [
             Constraint::Min(0),
             Constraint::Length(3),
+	    Constraint::Length(1),
             Constraint::Min(0),
         ],
     )
@@ -96,4 +100,15 @@ fn ui(f: &mut Frame, app: &App) {
 	    .title("Enter your guess")
 	);
     f.render_widget(input, middle_rect);
+
+    if let Some(last_guess_direction) = &app.last_guess_direction {
+	let text_content = match last_guess_direction {
+	    LastGuessDirection::TooHigh => "Too high!",
+	    LastGuessDirection::TooLow => "Too low!",
+	    LastGuessDirection::Correct => "Correct!",
+	};
+	let error_message = Paragraph::new(Text::styled(text_content, Style::default().fg(Color::Red)));
+	f.render_widget(error_message, horizontal_layout.split(vertical_layout.split(f.size())[2])[1])
+    }
+
 }
