@@ -7,6 +7,7 @@ use ratatui::{
 
 use crate::{app::App, constants};
 
+// TODO: Show a block around everything with the name of the game and the level
 pub fn render(f: &mut Frame, app: &App) {
     let vertical_layout = Layout::new(
         Direction::Vertical,

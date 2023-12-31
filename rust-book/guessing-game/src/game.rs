@@ -7,11 +7,11 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new() -> Self {
+    pub fn new(level: u16) -> Self {
 	let mut rng = rand::thread_rng();
 	
 	Self {
-	    solution: rng.gen_range(1..=100),
+	    solution: rng.gen_range(1..=(10_u64.pow(level.into()))),
 	}
     }
 
@@ -20,6 +20,7 @@ impl Game {
     }
 }
 
+#[derive(Copy, Clone)]
 pub enum GuessResult {
     TooHigh,
     TooLow,
