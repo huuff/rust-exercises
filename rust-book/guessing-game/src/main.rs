@@ -3,6 +3,7 @@ mod event;
 mod util;
 mod constants;
 mod game;
+mod message;
 
 use std::io;
 
@@ -103,15 +104,10 @@ fn ui(f: &mut Frame, app: &App) {
 	);
     f.render_widget(input, middle_rect);
 
-    if let Some(last_guess_result) = &app.last_guess_result {
-	let text_content = match last_guess_result {
-	    GuessResult::TooHigh => "Too high!",
-	    GuessResult::TooLow => "Too low!",
-	    GuessResult::Correct => "Correct!",
-	};
-	let error_message = Paragraph::new(Text::styled(text_content, Style::default().fg(Color::Red)));
+    if let Some(message) = &app.message {
+	let message_paragraph = Paragraph::new(message.to_text());
 	// TODO: Maybe put in a variable like I did for middle_rect so it's easier to understand
-	f.render_widget(error_message, horizontal_layout.split(vertical_layout.split(f.size())[2])[1])
+	f.render_widget(message_paragraph, horizontal_layout.split(vertical_layout.split(f.size())[2])[1])
     }
 
 }

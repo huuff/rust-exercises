@@ -1,9 +1,9 @@
-use crate::{constants, game::{self, Game}};
+use crate::{constants, game::{self, Game}, message::Message};
 
 pub struct App {
     game: Game,
     pub input: String,
-    pub last_guess_result: Option<game::GuessResult>,
+    pub message: Option<Message>,
     
 }
 
@@ -12,7 +12,7 @@ impl App {
 	Self {
 	    input: String::new(),
 	    game: Game::new(),
-	    last_guess_result: None,
+	    message: None,
 	}
     }
 
@@ -29,7 +29,7 @@ impl App {
     pub fn submit_guess(&mut self) {
 	let numeric_guess = self.input.parse::<u64>().expect("input is not a number");
 
-	self.last_guess_result = Some(self.game.guess(numeric_guess));
+	self.message = Some(Message::from_guess_result(self.game.guess(numeric_guess)));
 
 	self.input.clear();
     }
