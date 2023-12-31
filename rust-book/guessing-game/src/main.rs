@@ -1,9 +1,9 @@
 mod app;
 mod event;
-mod util;
 mod constants;
 mod game;
 mod message;
+mod ui;
 
 use std::io;
 
@@ -16,9 +16,7 @@ use crossterm::{
 use event::{Event, EventHandler};
 use ratatui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout, SegmentSize, Alignment},
-    widgets::{Block, Borders, Paragraph},
-    Frame, Terminal, TerminalOptions, Viewport, text::Text, 
+    Terminal, TerminalOptions, Viewport,
 };
 
 
@@ -38,7 +36,7 @@ fn main() -> anyhow::Result<()> {
     loop {
         match event_handler.next()? {
             Event::Tick => {
-                terminal.draw(|f| ui(f, &app))?;
+                terminal.draw(|f| ui::render(f, &app))?;
             }
 	    // TODO: Maybe move this key handling somewhere else
             Event::Key(key) => {
@@ -68,45 +66,4 @@ fn main() -> anyhow::Result<()> {
     disable_raw_mode()?;
     io::stdout().execute(LeaveAlternateScreen)?;
     Ok(())
-}
-
-// TODO: In a separate ui module
-fn ui(f: &mut Frame, app: &App) {
-    let vertical_layout = Layout::new(
-        Direction::Vertical,
-        [
-            Constraint::Min(0),
-            Constraint::Length(3),
-	    Constraint::Length(1),
-            Constraint::Min(0),
-        ],
-    )
-    .segment_size(SegmentSize::EvenDistribution);
-
-    let horizontal_layout = Layout::new(
-        Direction::Horizontal,
-        [
-            Constraint::Min(0),
-	    // max size of the input plus 2 for the block borders
-            Constraint::Length(constants::MAX_INPUT_SIZE as u16 + 2),
-            Constraint::Min(0),
-        ],
-    )
-    .segment_size(SegmentSize::EvenDistribution);
-
-    let middle_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
-    
-    let input = Paragraph::new(Text::raw(&app.input))
-        .block(Block::default()
-	    .borders(Borders::ALL)
-	    .title("Enter your guess")
-	);
-    f.render_widget(input, middle_rect);
-
-    if let Some(message) = &app.message {
-	let message_paragraph = Paragraph::new(message.to_text()).alignment(Alignment::Center);
-	let below_input_rect = vertical_layout.split(f.size())[2];
-	f.render_widget(message_paragraph, below_input_rect);
-    }
-
 }
