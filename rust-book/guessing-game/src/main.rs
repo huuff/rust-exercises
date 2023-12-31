@@ -2,16 +2,18 @@ mod app;
 mod event;
 mod util;
 mod constants;
+mod game;
 
 use std::io;
 
-use app::{App, LastGuessDirection};
+use app::App;
 use crossterm::{
     event::KeyCode,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
 use event::{Event, EventHandler};
+use game::GuessResult;
 use ratatui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout, SegmentSize},
@@ -101,13 +103,14 @@ fn ui(f: &mut Frame, app: &App) {
 	);
     f.render_widget(input, middle_rect);
 
-    if let Some(last_guess_direction) = &app.last_guess_direction {
-	let text_content = match last_guess_direction {
-	    LastGuessDirection::TooHigh => "Too high!",
-	    LastGuessDirection::TooLow => "Too low!",
-	    LastGuessDirection::Correct => "Correct!",
+    if let Some(last_guess_result) = &app.last_guess_result {
+	let text_content = match last_guess_result {
+	    GuessResult::TooHigh => "Too high!",
+	    GuessResult::TooLow => "Too low!",
+	    GuessResult::Correct => "Correct!",
 	};
 	let error_message = Paragraph::new(Text::styled(text_content, Style::default().fg(Color::Red)));
+	// TODO: Maybe put in a variable like I did for middle_rect so it's easier to understand
 	f.render_widget(error_message, horizontal_layout.split(vertical_layout.split(f.size())[2])[1])
     }
 
