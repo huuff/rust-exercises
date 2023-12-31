@@ -106,8 +106,8 @@ fn ui(f: &mut Frame, app: &App) {
 
     if let Some(message) = &app.message {
 	let message_paragraph = Paragraph::new(message.to_text());
-	// TODO: Maybe put in a variable like I did for middle_rect so it's easier to understand
-	f.render_widget(message_paragraph, horizontal_layout.split(vertical_layout.split(f.size())[2])[1])
+	let below_input_rect = horizontal_layout.split(vertical_layout.split(f.size())[2])[1];
+	f.render_widget(message_paragraph, below_input_rect);
     }
 
 }
