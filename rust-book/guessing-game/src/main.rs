@@ -14,12 +14,11 @@ use crossterm::{
     ExecutableCommand,
 };
 use event::{Event, EventHandler};
-use game::GuessResult;
 use ratatui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout, SegmentSize},
     widgets::{Block, Borders, Paragraph},
-    Frame, Terminal, TerminalOptions, Viewport, text::Text, style::{Style, Color},
+    Frame, Terminal, TerminalOptions, Viewport, text::Text, 
 };
 
 
