@@ -16,7 +16,7 @@ use crossterm::{
 use event::{Event, EventHandler};
 use ratatui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout, SegmentSize},
+    layout::{Constraint, Direction, Layout, SegmentSize, Alignment},
     widgets::{Block, Borders, Paragraph},
     Frame, Terminal, TerminalOptions, Viewport, text::Text, 
 };
@@ -104,8 +104,8 @@ fn ui(f: &mut Frame, app: &App) {
     f.render_widget(input, middle_rect);
 
     if let Some(message) = &app.message {
-	let message_paragraph = Paragraph::new(message.to_text());
-	let below_input_rect = horizontal_layout.split(vertical_layout.split(f.size())[2])[1];
+	let message_paragraph = Paragraph::new(message.to_text()).alignment(Alignment::Center);
+	let below_input_rect = vertical_layout.split(f.size())[2];
 	f.render_widget(message_paragraph, below_input_rect);
     }
 

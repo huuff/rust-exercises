@@ -8,6 +8,11 @@ pub struct Message {
 }
 
 impl Message {
+    pub fn new(text: &'static str, color: Color) -> Self {
+	Self { text, color }
+    }
+
+    
     pub fn from_guess_result(r: GuessResult) -> Self {
 	Self {
 	    text: match r {

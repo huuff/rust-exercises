@@ -1,4 +1,8 @@
-use crate::{constants, game::{self, Game}, message::Message};
+use std::num::IntErrorKind;
+
+use ratatui::style::Color;
+
+use crate::{constants, game::Game, message::Message};
 
 pub struct App {
     game: Game,
@@ -27,10 +31,19 @@ impl App {
     }
 
     pub fn submit_guess(&mut self) {
-	let numeric_guess = self.input.parse::<u64>().expect("input is not a number");
+	match self.input.parse::<u64>() {
+	    Ok(guess) => {
+		self.message = Some(Message::from_guess_result(self.game.check_guess(guess)));
+		self.input.clear();
+	    }
+	    Err(err) => {
+		if let IntErrorKind::Empty = err.kind() {
+		    self.message = Some(Message::new("You must enter something!", Color::Red))
+		} else {
+		    panic!("{}", err)
+		}
+	    }
+	}
 
-	self.message = Some(Message::from_guess_result(self.game.guess(numeric_guess)));
-
-	self.input.clear();
     }
 }

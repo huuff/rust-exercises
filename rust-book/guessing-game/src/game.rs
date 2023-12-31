@@ -15,7 +15,7 @@ impl Game {
 	}
     }
 
-    pub fn guess(&self, guess: u64) -> GuessResult {
+    pub fn check_guess(&self, guess: u64) -> GuessResult {
 	GuessResult::from_ordering(guess.cmp(&self.solution))
     }
 }
