@@ -7,8 +7,13 @@ use ratatui::{
 
 use crate::{app::App, constants};
 
-// TODO: Show a block around everything with the name of the game and the level
 pub fn render(f: &mut Frame, app: &App) {
+    let outer_block = Block::default()
+        .title(format!("Guess the number! Level {}", app.level))
+        .borders(Borders::ALL)
+	;
+    f.render_widget(outer_block, f.size());
+    
     let vertical_layout = Layout::new(
         Direction::Vertical,
         [
