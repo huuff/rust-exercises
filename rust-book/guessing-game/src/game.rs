@@ -2,9 +2,11 @@ use std::cmp;
 
 use rand::Rng;
 
+use crate::history::{History, HistoryEntry};
+
 pub struct Game {
    solution: u64,
-   pub attempts: u64,
+   pub guess_history: History<u64, GuessResult>,
 }
 
 impl Game {
@@ -13,13 +15,18 @@ impl Game {
 	
 	Self {
 	    solution: rng.gen_range(1..=(10_u64.pow(level.into()))),
-	    attempts: 0,
+	    guess_history: History::new(),
 	}
     }
 
     pub fn check_guess(&mut self, guess: u64) -> GuessResult {
-	self.attempts += 1;
-	GuessResult::from_ordering(guess.cmp(&self.solution))
+	let result = GuessResult::from_ordering(guess.cmp(&self.solution));
+	self.guess_history.push(HistoryEntry { key: guess, value: result });
+	result
+    }
+
+    pub fn attempts(&self) -> usize {
+	self.guess_history.entries.len()
     }
 }
 

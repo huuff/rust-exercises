@@ -119,7 +119,7 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
 		
 		Text::styled(
 		    format!("Level {}: {} attempts", key, value),
-		    match value.cmp(&optimal_attempts) {
+		    match value.cmp(&(optimal_attempts.try_into().unwrap())) {
 			Ordering::Less => Style::new().bg(Color::Green),
 			Ordering::Equal => Style::new().bg(Color::Blue),
 			Ordering::Greater => Style::new().bg(Color::Red),

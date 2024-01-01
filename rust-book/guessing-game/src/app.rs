@@ -10,7 +10,7 @@ pub struct App {
     pub input: String,
     pub message: Option<Message>,
     pub current_tick: u64,
-    pub game_history: History<u16, u64>,
+    pub game_history: History<u16, usize>,
 }
 
 impl App {
@@ -42,7 +42,7 @@ impl App {
 		let guess_result = self.game.check_guess(guess);
 
 		if let GuessResult::Correct = guess_result {
-		    self.game_history.push(HistoryEntry { key: self.level, value: self.game.attempts });
+		    self.game_history.push(HistoryEntry { key: self.level, value: self.game.attempts() });
 		    self.advance_level();
 		}
 		
