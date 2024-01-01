@@ -60,7 +60,7 @@ fn render_input(f: &mut Frame, app: &App, target_rect: Rect) {
         [
             Constraint::Min(0),
             // max size of the input plus 2 for the block borders
-            Constraint::Length(constants::MAX_INPUT_SIZE as u16 + 2),
+            Constraint::Length(constants::MAX_INPUT_SIZE + 2),
             Constraint::Min(0),
         ],
     )
@@ -79,7 +79,7 @@ fn render_input(f: &mut Frame, app: &App, target_rect: Rect) {
     // Render a blinking cursor
     let ticks_for_a_blink = constants::CURSOR_BLINK_DURATION_MILLIS / constants::TICK_TIME_MILLIS;
     if (app.current_tick % (ticks_for_a_blink*2)) > ticks_for_a_blink
-	&& app.input.len() < constants::MAX_INPUT_SIZE
+	&& app.input.len() < constants::MAX_INPUT_SIZE.try_into().unwrap()
     {
 	let cursor = Block::default().style(Style::new().bg(Color::White));
 	f.render_widget(
@@ -114,7 +114,7 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
 	app.game_history.entries
 	    .iter()
 	    .map(|HistoryEntry { key, value }| {
-		let max_solution: f64 = 10_f64.powf(*key as f64);
+		let max_solution: f64 = 10_f64.powf((*key).into());
 		let optimal_attempts = max_solution.log2().ceil() as u64;
 		
 		Text::styled(

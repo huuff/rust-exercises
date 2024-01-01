@@ -27,7 +27,7 @@ impl App {
     }
 
     pub fn add_to_input(&mut self, c: char) {
-	if self.input.len() < constants::MAX_INPUT_SIZE {
+	if self.input.len() < constants::MAX_INPUT_SIZE.try_into().unwrap() {
 	    self.input.push(c);
 	}
     }
