@@ -9,6 +9,7 @@ pub struct App {
     pub level: u16,
     pub input: String,
     pub message: Option<Message>,
+    pub current_tick: u64,
 }
 
 impl App {
@@ -19,6 +20,7 @@ impl App {
 	    level,
 	    game: Game::new(level),
 	    message: None,
+	    current_tick: 0,
 	}
     }
 
