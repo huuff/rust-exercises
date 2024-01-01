@@ -73,8 +73,9 @@ fn render_input(f: &mut Frame, app: &App, target_rect: Rect) {
     );
     f.render_widget(input, input_rect);
 
-    // TODO: Do this better, with a constant for the tick rate and all
-    if (app.current_tick % 120) > 60 {
+    // Render a blinking cursor
+    let ticks_for_a_blink = constants::CURSOR_BLINK_DURATION_MILLIS / constants::TICK_TIME_MILLIS;
+    if (app.current_tick % (ticks_for_a_blink*2)) > ticks_for_a_blink {
 	let cursor = Block::default().style(Style::new().bg(Color::White));
 	f.render_widget(cursor, Rect::new(input_rect.x+1, input_rect.y+1, 1, 1));
     }
@@ -91,7 +92,7 @@ fn render_instructions(f: &mut Frame, target_rect: Rect) {
     let list = List::new([
 	"'q': exit",
 	"'enter': submit guess",
-    ]).nblock(Block::default()
+    ]).block(Block::default()
              .title("Instructions")
             .borders(Borders::ALL)
     );

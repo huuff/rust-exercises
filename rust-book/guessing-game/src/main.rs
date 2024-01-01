@@ -31,7 +31,7 @@ fn main() -> anyhow::Result<()> {
     )?;
    
     let mut app = App::new();
-    let event_handler = EventHandler::new(16);
+    let event_handler = EventHandler::new(constants::TICK_TIME_MILLIS);
 
     loop {
         match event_handler.next()? {
