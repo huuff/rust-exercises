@@ -7,7 +7,6 @@ use ratatui::{
 
 use crate::{app::App, constants};
 
-// TODO: Rander a block with past guesses and past levels
 pub fn render(f: &mut Frame, app: &App) {
     render_outer_block(f, app);
     
@@ -31,6 +30,7 @@ pub fn render(f: &mut Frame, app: &App) {
     let bottom_layout = Layout::new(
 	Direction::Horizontal,
 	[
+	    Constraint::Length(30),
 	    Constraint::Min(0),
 	    Constraint::Length(30),
 	]
@@ -38,7 +38,8 @@ pub fn render(f: &mut Frame, app: &App) {
 	.segment_size(SegmentSize::EvenDistribution)
 	.split(vertical_layout[3]);
 
-    render_instructions(f, bottom_layout[1].offset(Offset { x: -2, y: -1 }));
+    render_history(f, app, bottom_layout[0].offset(Offset { x: 2, y: -1 }));
+    render_instructions(f, bottom_layout[2].offset(Offset { x: -2, y: -1 }));
 
 }
 
@@ -103,4 +104,19 @@ fn render_instructions(f: &mut Frame, target_rect: Rect) {
     );
 
     f.render_widget(list, target_rect)
+}
+
+// TODO: Render a separate tabbed history for guesses
+fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
+    let list = List::new(
+	app.game_history.entries
+	    .iter()
+	    .map(|entry| format!("Level {}: {} attempts", entry.key, entry.value))
+    ).block(Block::default()
+            .title("Levels")
+            .borders(Borders::ALL)
+    );
+
+    f.render_widget(list, target_rect)
+    
 }

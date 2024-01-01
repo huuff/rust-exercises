@@ -2,7 +2,7 @@ use std::num::IntErrorKind;
 
 use ratatui::style::Color;
 
-use crate::{constants, game::{Game, GuessResult}, message::Message};
+use crate::{constants, game::{Game, GuessResult}, message::Message, history::{History, HistoryEntry}};
 
 pub struct App {
     game: Game,
@@ -10,6 +10,7 @@ pub struct App {
     pub input: String,
     pub message: Option<Message>,
     pub current_tick: u64,
+    pub game_history: History<u16, u64>,
 }
 
 impl App {
@@ -21,6 +22,7 @@ impl App {
 	    game: Game::new(level),
 	    message: None,
 	    current_tick: 0,
+	    game_history: History::new(),
 	}
     }
 
@@ -40,6 +42,7 @@ impl App {
 		let guess_result = self.game.check_guess(guess);
 
 		if let GuessResult::Correct = guess_result {
+		    self.game_history.push(HistoryEntry { key: self.level, value: self.game.attempts });
 		    self.advance_level();
 		}
 		

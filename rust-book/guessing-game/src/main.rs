@@ -4,6 +4,7 @@ mod constants;
 mod game;
 mod message;
 mod ui;
+mod history;
 
 use std::io;
 

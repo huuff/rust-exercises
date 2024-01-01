@@ -4,6 +4,7 @@ use rand::Rng;
 
 pub struct Game {
    solution: u64,
+   pub attempts: u64,
 }
 
 impl Game {
@@ -12,10 +13,12 @@ impl Game {
 	
 	Self {
 	    solution: rng.gen_range(1..=(10_u64.pow(level.into()))),
+	    attempts: 0,
 	}
     }
 
-    pub fn check_guess(&self, guess: u64) -> GuessResult {
+    pub fn check_guess(&mut self, guess: u64) -> GuessResult {
+	self.attempts += 1;
 	GuessResult::from_ordering(guess.cmp(&self.solution))
     }
 }
