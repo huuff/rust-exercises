@@ -19,7 +19,7 @@ use ratatui::{
     Terminal, TerminalOptions, Viewport,
 };
 
-
+// TODO: Maybe allow saving the game?
 fn main() -> anyhow::Result<()> {
     enable_raw_mode()?;
     io::stdout().execute(EnterAlternateScreen)?;
