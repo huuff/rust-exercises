@@ -1,13 +1,12 @@
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout, Rect, SegmentSize},
+    layout::{Alignment, Constraint, Direction, Layout, Rect, SegmentSize, Offset},
     text::Text,
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, Paragraph, List},
     Frame,
 };
 
 use crate::{app::App, constants};
 
-// TODO: Render a block with keybindings and instructions
 // TODO: Rander a block with past guesses and past levels
 pub fn render(f: &mut Frame, app: &App) {
     render_outer_block(f, app);
@@ -28,6 +27,18 @@ pub fn render(f: &mut Frame, app: &App) {
     render_input(f, app, vertical_layout[1]);
 
     render_message(f, app, vertical_layout[2]);
+
+    let bottom_layout = Layout::new(
+	Direction::Horizontal,
+	[
+	    Constraint::Min(0),
+	    Constraint::Length(30),
+	]
+    )
+	.segment_size(SegmentSize::EvenDistribution)
+	.split(vertical_layout[3]);
+
+    render_instructions(f, bottom_layout[1].offset(Offset { x: -2, y: -1 }));
 
 }
 
@@ -66,4 +77,16 @@ fn render_message(f: &mut Frame, app: &App, target_rect: Rect) {
 	let message_paragraph = Paragraph::new(message.to_text()).alignment(Alignment::Center);
 	f.render_widget(message_paragraph, target_rect);
     }
+}
+
+fn render_instructions(f: &mut Frame, target_rect: Rect) {
+    let list = List::new([
+	"'q': exit",
+	"'enter': submit guess",
+    ]).block(Block::default()
+             .title("Instructions")
+            .borders(Borders::ALL)
+    );
+
+    f.render_widget(list, target_rect)
 }
