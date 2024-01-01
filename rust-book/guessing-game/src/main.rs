@@ -20,6 +20,7 @@ use ratatui::{
     Terminal, TerminalOptions, Viewport,
 };
 
+// TODO: I should improve all my type conversions... are type castings (as ...) any good?
 // TODO: Maybe allow saving the game?
 fn main() -> anyhow::Result<()> {
     enable_raw_mode()?;

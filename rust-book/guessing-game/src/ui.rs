@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect, SegmentSize, Offset},
     text::Text,
@@ -5,7 +7,7 @@ use ratatui::{
     Frame, style::{Style, Color},
 };
 
-use crate::{app::App, constants};
+use crate::{app::App, constants, history::HistoryEntry};
 
 pub fn render(f: &mut Frame, app: &App) {
     render_outer_block(f, app);
@@ -111,7 +113,18 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
     let list = List::new(
 	app.game_history.entries
 	    .iter()
-	    .map(|entry| format!("Level {}: {} attempts", entry.key, entry.value))
+	    .map(|HistoryEntry { key, value }| {
+		let max_solution: f64 = 10_f64.powf(*key as f64);
+		let optimal_attempts = max_solution.log2().ceil() as u64;
+		
+		Text::styled(
+		    format!("Level {}: {} attempts", key, value),
+		    match value.cmp(&optimal_attempts) {
+			Ordering::Less => Style::new().bg(Color::Green),
+			Ordering::Equal => Style::new().bg(Color::Blue),
+			Ordering::Greater => Style::new().bg(Color::Red),
+		    })
+	    })
     ).block(Block::default()
             .title("Levels")
             .borders(Borders::ALL)
