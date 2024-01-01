@@ -51,6 +51,7 @@ fn render_outer_block(f: &mut Frame, app: &App) {
     f.render_widget(outer_block, f.size());
 }
 
+// TODO: A cute blinking cursor?
 fn render_input(f: &mut Frame, app: &App, target_rect: Rect) {
     let horizontal_layout = Layout::new(
         Direction::Horizontal,
