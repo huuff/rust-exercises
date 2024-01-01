@@ -75,7 +75,9 @@ fn render_input(f: &mut Frame, app: &App, target_rect: Rect) {
 
     // Render a blinking cursor
     let ticks_for_a_blink = constants::CURSOR_BLINK_DURATION_MILLIS / constants::TICK_TIME_MILLIS;
-    if (app.current_tick % (ticks_for_a_blink*2)) > ticks_for_a_blink {
+    if (app.current_tick % (ticks_for_a_blink*2)) > ticks_for_a_blink
+	&& app.input.len() < constants::MAX_INPUT_SIZE
+    {
 	let cursor = Block::default().style(Style::new().bg(Color::White));
 	f.render_widget(
 	    cursor,
