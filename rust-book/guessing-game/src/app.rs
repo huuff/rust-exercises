@@ -54,6 +54,14 @@ impl App {
 	}
     }
 
+    pub fn clear_message_if_expired(&mut self) {
+	if let Some(message) = &self.message {
+	    if message.is_expired() {
+		self.message = None;
+	    } 
+	}
+    }
+
     fn advance_level(&mut self) {
 	// Advance only if the level is below the max size of the input since each level adds a digit
 	// to the maximum possible solution

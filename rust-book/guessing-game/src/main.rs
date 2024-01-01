@@ -36,6 +36,7 @@ fn main() -> anyhow::Result<()> {
     loop {
         match event_handler.next()? {
             Event::Tick => {
+		app.clear_message_if_expired();
                 terminal.draw(|f| ui::render(f, &app))?;
             }
 	    // TODO: Maybe move this key handling somewhere else
