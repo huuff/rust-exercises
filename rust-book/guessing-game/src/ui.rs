@@ -133,7 +133,6 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
                 .iter()
                 .map(|HistoryEntry { key, value }| Text::raw(format!("{key}: {value}"))),
         ),
-        // TODO: Less ugly styles
         HistoryTab::Games => List::new(app.game_history.entries.iter().map(
             |HistoryEntry { key, value }| {
                 let max_solution: f64 = 10_f64.powf((*key).into());
@@ -142,9 +141,9 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
                 Text::styled(
                     format!("Level {key}: {value} attempts"),
                     match value.cmp(&(optimal_attempts.try_into().unwrap())) {
-                        Ordering::Less => Style::new().bg(Color::Green),
-                        Ordering::Equal => Style::new().bg(Color::Blue),
-                        Ordering::Greater => Style::new().bg(Color::Red),
+                        Ordering::Less => Style::new().bg(Color::Green).fg(Color::Black),
+                        Ordering::Equal => Style::new().fg(Color::White),
+                        Ordering::Greater => Style::new().bg(Color::Red).fg(Color::Black),
                     },
                 )
             },
