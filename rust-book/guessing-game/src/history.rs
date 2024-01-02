@@ -11,9 +11,8 @@ impl <K, V> History<K, V> {
 	}
     }
 
-    // TODO: Instead of receiving a history entry... receive just the key and value?
-    pub fn push(&mut self, entry: HistoryEntry<K, V>) {
-	self.entries.push_front(entry);
+    pub fn push(&mut self, key: K, value: V) {
+	self.entries.push_front(HistoryEntry { key, value });
     }
 }
 

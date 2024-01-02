@@ -2,7 +2,7 @@ use std::num::IntErrorKind;
 
 use ratatui::style::Color;
 
-use crate::{constants, game::{Game, GuessResult}, message::Message, history::{History, HistoryEntry}};
+use crate::{constants, game::{Game, GuessResult}, message::Message, history::History};
 
 pub enum HistoryTab {
     Games,
@@ -49,7 +49,7 @@ impl App {
 		let guess_result = self.game.check_guess(guess);
 
 		if let GuessResult::Correct = guess_result {
-		    self.game_history.push(HistoryEntry { key: self.level, value: self.game.attempts() });
+		    self.game_history.push(self.level, self.game.attempts());
 		    self.advance_level();
 		}
 		

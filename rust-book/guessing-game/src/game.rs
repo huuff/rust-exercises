@@ -2,7 +2,7 @@ use std::{cmp, fmt::Display};
 
 use rand::Rng;
 
-use crate::history::{History, HistoryEntry};
+use crate::history::History;
 
 pub struct Game {
    solution: u64,
@@ -21,7 +21,7 @@ impl Game {
 
     pub fn check_guess(&mut self, guess: u64) -> GuessResult {
 	let result = GuessResult::from_ordering(guess.cmp(&self.solution));
-	self.guess_history.push(HistoryEntry { key: guess, value: result });
+	self.guess_history.push(guess, result);
 	result
     }
 
