@@ -4,13 +4,19 @@ use ratatui::style::Color;
 
 use crate::{constants, game::{Game, GuessResult}, message::Message, history::{History, HistoryEntry}};
 
+pub enum HistoryTab {
+    Games,
+    Guesses,
+}
+
 pub struct App {
-    game: Game,
+    pub game: Game,
     pub level: u16,
     pub input: String,
     pub message: Option<Message>,
     pub current_tick: u64,
     pub game_history: History<u16, usize>,
+    pub current_tab: HistoryTab,
 }
 
 impl App {
@@ -23,6 +29,7 @@ impl App {
 	    message: None,
 	    current_tick: 0,
 	    game_history: History::new(),
+	    current_tab: HistoryTab::Guesses,
 	}
     }
 
@@ -51,7 +58,7 @@ impl App {
 	    }
 	    Err(err) => {
 		if let IntErrorKind::Empty = err.kind() {
-		    self.message = Some(Message::new("You must enter something!", Color::Red))
+		    self.message = Some(Message::new("You must enter something!".to_string(), Color::Red))
 		} else {
 		    panic!("{}", err)
 		}
@@ -64,6 +71,13 @@ impl App {
 	    if message.is_expired() {
 		self.message = None;
 	    } 
+	}
+    }
+
+    pub fn switch_tab(&mut self) {
+	self.current_tab = match self.current_tab {
+	    HistoryTab::Games => HistoryTab::Guesses,
+	    HistoryTab::Guesses => HistoryTab::Games,
 	}
     }
 

@@ -21,6 +21,7 @@ use ratatui::{
 };
 
 // TODO: Maybe allow saving the game?
+// TODO: Some winning condition
 fn main() -> anyhow::Result<()> {
     enable_raw_mode()?;
     io::stdout().execute(EnterAlternateScreen)?;
@@ -51,6 +52,10 @@ fn main() -> anyhow::Result<()> {
 
 			if c == 'q' {
 			    break;
+			}
+
+			if c == 't' {
+			    app.switch_tab();
 			}
                     }
 		    KeyCode::Enter => {

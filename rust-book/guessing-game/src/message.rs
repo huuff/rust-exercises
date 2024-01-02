@@ -8,13 +8,14 @@ use ratatui::{
 use crate::{game::GuessResult, constants};
 
 pub struct Message {
-    text: &'static str,
+    text: String,
     color: Color,
     created_at: Instant,
 }
 
 impl Message {
-    pub fn new(text: &'static str, color: Color) -> Self {
+    // TODO: Can I make this take an &str?
+    pub fn new(text: String, color: Color) -> Self {
         Self {
             text,
             color,
@@ -24,11 +25,7 @@ impl Message {
 
     pub fn from_guess_result(r: GuessResult) -> Self {
         Self::new(
-            match r {
-                GuessResult::TooHigh => "Too high!",
-                GuessResult::TooLow => "Too low!",
-                GuessResult::Correct => "Correct!",
-            },
+            r.to_string(),
             match r {
                 GuessResult::TooHigh | GuessResult::TooLow => Color::Red,
                 GuessResult::Correct => Color::Green,
@@ -37,7 +34,7 @@ impl Message {
     }
 
     pub fn to_text(&self) -> Text {
-        Text::styled(self.text, Style::default().fg(self.color))
+        Text::styled(&self.text, Style::default().fg(self.color))
     }
 
     pub fn is_expired(&self) -> bool {
