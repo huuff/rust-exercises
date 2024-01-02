@@ -104,11 +104,7 @@ fn render_message(f: &mut Frame, app: &App, target_rect: Rect) {
 }
 
 fn render_instructions(f: &mut Frame, target_rect: Rect) {
-    let list = List::new([
-	"'q': exit",
-	"'enter': submit guess",
-	"'t': change tab"
-    ])
+    let list = List::new(["'q': exit", "'enter': submit guess", "'t': change tab"])
         .block(Block::default().title("Instructions").borders(Borders::ALL));
 
     f.render_widget(list, target_rect)
@@ -120,46 +116,41 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
         .style(Style::default().fg(Color::White))
         .highlight_style(Style::default().fg(Color::Yellow))
         .select(match app.current_tab {
-	    HistoryTab::Guesses => 0,
-	    HistoryTab::Games => 1,
-	})
+            HistoryTab::Guesses => 0,
+            HistoryTab::Games => 1,
+        })
         .divider("|");
 
     let tabs_target_rect = Rect::new(target_rect.x, target_rect.y - 2, target_rect.width, 3);
     f.render_widget(tabs, tabs_target_rect);
 
-    // TODO: Extract the list, the block and the render
-    match app.current_tab {
-	// TODO: Some styling
-        HistoryTab::Guesses => {
-	    let list = List::new(app.game.guess_history.entries.iter().map(
-		|HistoryEntry { key, value }| {
-		    Text::raw(format!("{key}: {value}"))
-		}
-	    )).block(Block::default().borders(Borders::ALL));
+    let list = match app.current_tab {
+        // TODO: Some styling
+        HistoryTab::Guesses => List::new(
+            app.game
+                .guess_history
+                .entries
+                .iter()
+                .map(|HistoryEntry { key, value }| Text::raw(format!("{key}: {value}"))),
+        ),
+        // TODO: Less ugly styles
+        HistoryTab::Games => List::new(app.game_history.entries.iter().map(
+            |HistoryEntry { key, value }| {
+                let max_solution: f64 = 10_f64.powf((*key).into());
+                let optimal_attempts = max_solution.log2().ceil() as u64;
 
-            f.render_widget(list, target_rect);
-	},
-	// TODO: Less ugly styles
-        HistoryTab::Games => {
-            let list = List::new(app.game_history.entries.iter().map(
-                |HistoryEntry { key, value }| {
-                    let max_solution: f64 = 10_f64.powf((*key).into());
-                    let optimal_attempts = max_solution.log2().ceil() as u64;
-
-                    Text::styled(
-                        format!("Level {key}: {value} attempts"),
-                        match value.cmp(&(optimal_attempts.try_into().unwrap())) {
-                            Ordering::Less => Style::new().bg(Color::Green),
-                            Ordering::Equal => Style::new().bg(Color::Blue),
-                            Ordering::Greater => Style::new().bg(Color::Red),
-                        },
-                    )
-                },
-            ))
-            .block(Block::default().borders(Borders::ALL));
-
-            f.render_widget(list, target_rect);
-        }
+                Text::styled(
+                    format!("Level {key}: {value} attempts"),
+                    match value.cmp(&(optimal_attempts.try_into().unwrap())) {
+                        Ordering::Less => Style::new().bg(Color::Green),
+                        Ordering::Equal => Style::new().bg(Color::Blue),
+                        Ordering::Greater => Style::new().bg(Color::Red),
+                    },
+                )
+            },
+        )),
     }
+    .block(Block::default().borders(Borders::ALL));
+
+    f.render_widget(list, target_rect);
 }
