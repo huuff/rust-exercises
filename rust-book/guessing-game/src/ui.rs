@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Offset, Rect, SegmentSize},
-    style::{Color, Style},
+    style::{Color, Style, Modifier},
     text::Text,
     widgets::{Block, Borders, List, Paragraph, Tabs},
     Frame,
@@ -114,7 +114,7 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
     let tabs = Tabs::new(vec!["Guesses", "Games"])
         .block(Block::default().borders(Borders::TOP | Borders::LEFT | Borders::RIGHT))
         .style(Style::default().fg(Color::White))
-        .highlight_style(Style::default().fg(Color::Yellow))
+        .highlight_style(Style::default().add_modifier(Modifier::UNDERLINED))
         .select(match app.current_tab {
             HistoryTab::Guesses => 0,
             HistoryTab::Games => 1,
