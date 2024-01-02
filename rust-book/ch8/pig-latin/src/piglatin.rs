@@ -1,6 +1,5 @@
 use std::io::{Read, BufWriter, Write, BufReader, self};
 
-// TODO: Test it!
 pub fn piglatinize<W: Write, R: Read>(reader: &mut BufReader<R>, writer: &mut BufWriter<W>) -> Result<(), io::Error> {
     let mut current_word_buffer = Vec::new();
     for byte in reader.bytes() {
@@ -31,7 +30,6 @@ fn piglatinize_word(word: &mut Vec<u8>) -> String {
     }
 }
 
-// TODO: Rename this to vowel lol
 const VOWELS: [u8; 10] = [
     b'a', b'e', b'i', b'o', b'u',
     b'A', b'E', b'I', b'O', b'U',
