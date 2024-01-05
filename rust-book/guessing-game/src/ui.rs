@@ -125,7 +125,6 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
     f.render_widget(tabs, tabs_target_rect);
 
     let list = match app.current_tab {
-        // TODO: Some styling
         HistoryTab::Guesses => List::new(
             app.game
                 .guess_history
