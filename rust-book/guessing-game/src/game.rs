@@ -2,7 +2,7 @@ use std::cmp;
 
 use rand::Rng;
 
-use crate::history::History;
+use crate::{history::History, level::GameLevel};
 
 pub struct Game {
    solution: u64,
@@ -10,11 +10,11 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(level: u16) -> Self {
+    pub fn new(level: GameLevel) -> Self {
 	let mut rng = rand::thread_rng();
 	
 	Self {
-	    solution: rng.gen_range(1..=(10_u64.pow(level.into()))),
+	    solution: rng.gen_range(1..=(level.max_solution())),
 	    guess_history: History::new(),
 	}
     }

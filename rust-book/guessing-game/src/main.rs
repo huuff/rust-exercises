@@ -5,6 +5,7 @@ mod game;
 mod message;
 mod ui;
 mod history;
+mod level;
 
 use std::io;
 

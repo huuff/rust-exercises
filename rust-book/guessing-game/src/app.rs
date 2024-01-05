@@ -2,7 +2,7 @@ use std::num::IntErrorKind;
 
 use ratatui::style::Color;
 
-use crate::{constants, game::{Game, GuessResult}, message::Message, history::History};
+use crate::{constants, game::{Game, GuessResult}, message::Message, history::History, level::GameLevel};
 
 pub enum HistoryTab {
     Games,
@@ -11,17 +11,17 @@ pub enum HistoryTab {
 
 pub struct App {
     pub game: Game,
-    pub level: u16,
+    pub level: GameLevel,
     pub input: String,
     pub message: Option<Message>,
     pub current_tick: u64,
-    pub game_history: History<u16, usize>,
+    pub game_history: History<GameLevel, usize>,
     pub current_tab: HistoryTab,
 }
 
 impl App {
     pub fn new() -> Self {
-	let level = 1;
+	let level = GameLevel(1);
 	Self {
 	    input: String::new(),
 	    level,
@@ -82,11 +82,7 @@ impl App {
     }
 
     fn advance_level(&mut self) {
-	// Advance only if the level is below the max size of the input since each level adds a digit
-	// to the maximum possible solution
-	if self.level < (constants::MAX_INPUT_SIZE as u16) {
-	    self.level += 1;
-	    self.game = Game::new(self.level);
-	}
+	self.level.advance();
+	self.game = Game::new(self.level);
     }
 }

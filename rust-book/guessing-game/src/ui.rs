@@ -52,7 +52,7 @@ pub fn render(f: &mut Frame, app: &App) {
 /// Render the outer block that will have the title
 fn render_outer_block(f: &mut Frame, app: &App) {
     let outer_block = Block::default()
-        .title(format!("Guess the number! Level {}", app.level))
+        .title(format!("Guess the number! Level {}", app.level.0))
         .borders(Borders::ALL);
     f.render_widget(outer_block, f.size());
 }
@@ -134,13 +134,10 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
                 .map(|HistoryEntry { key, value }| Text::raw(format!("{}: {}", key, value.to_str()))),
         ),
         HistoryTab::Games => List::new(app.game_history.entries.iter().map(
-            |HistoryEntry { key, value }| {
-                let max_solution: f64 = 10_f64.powf((*key).into());
-                let optimal_attempts = max_solution.log2().ceil() as u64;
-
+            |HistoryEntry { key: level, value }| {
                 Text::styled(
-                    format!("Level {key}: {value} attempts"),
-                    match value.cmp(&(optimal_attempts.try_into().unwrap())) {
+                    format!("Level {}: {} attempts", level.0, value),
+                    match value.cmp(&(level.optimal_guesses().try_into().unwrap())) {
                         Ordering::Less => Style::new().bg(Color::Green).fg(Color::Black),
                         Ordering::Equal => Style::new().fg(Color::White),
                         Ordering::Greater => Style::new().bg(Color::Red).fg(Color::Black),
