@@ -1,4 +1,4 @@
-use std::{cmp, fmt::Display};
+use std::cmp;
 
 use rand::Rng;
 
@@ -45,14 +45,13 @@ impl GuessResult {
 	    cmp::Ordering::Greater => GuessResult::TooHigh,
 	}
     }
-}
 
-impl Display for GuessResult {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-	write!(f, "{}", match self {
+    pub fn to_str(&self) -> &'static str {
+	match self {
 	    GuessResult::TooHigh => "Too high!",
 	    GuessResult::TooLow => "Too low!",
 	    GuessResult::Correct => "Correct!",
-	})
+	}
     }
 }
+

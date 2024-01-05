@@ -131,7 +131,7 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
                 .guess_history
                 .entries
                 .iter()
-                .map(|HistoryEntry { key, value }| Text::raw(format!("{key}: {value}"))),
+                .map(|HistoryEntry { key, value }| Text::raw(format!("{}: {}", key, value.to_str()))),
         ),
         HistoryTab::Games => List::new(app.game_history.entries.iter().map(
             |HistoryEntry { key, value }| {

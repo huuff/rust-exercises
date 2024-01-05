@@ -58,7 +58,7 @@ impl App {
 	    }
 	    Err(err) => {
 		if let IntErrorKind::Empty = err.kind() {
-		    self.message = Some(Message::new("You must enter something!".to_string(), Color::Red))
+		    self.message = Some(Message::new("You must enter something!", Color::Red))
 		} else {
 		    panic!("{}", err)
 		}
