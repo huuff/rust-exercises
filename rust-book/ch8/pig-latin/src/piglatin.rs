@@ -86,7 +86,6 @@ mod tests {
         let mut output = BufWriter::new(&mut output_buffer);
 
         let result = piglatinize(&mut input, &mut output);
-        // TODO: Lol, any better way?
         drop(output);
 
 
