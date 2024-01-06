@@ -6,6 +6,7 @@ mod message;
 mod ui;
 mod history;
 mod level;
+mod util;
 
 use std::io;
 
@@ -21,8 +22,8 @@ use ratatui::{
     Terminal, TerminalOptions, Viewport,
 };
 
+// TODO: Add a debug mode where I can see the current solution so I can test winning
 // TODO: Maybe allow saving the game?
-// TODO: Some winning condition
 fn main() -> anyhow::Result<()> {
     enable_raw_mode()?;
     io::stdout().execute(EnterAlternateScreen)?;

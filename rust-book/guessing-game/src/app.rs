@@ -17,6 +17,7 @@ pub struct App {
     pub current_tick: u64,
     pub game_history: History<GameLevel, usize>,
     pub current_tab: HistoryTab,
+    pub finished: bool,
 }
 
 impl App {
@@ -30,6 +31,7 @@ impl App {
 	    current_tick: 0,
 	    game_history: History::new(),
 	    current_tab: HistoryTab::Guesses,
+	    finished: false,
 	}
     }
 
@@ -50,7 +52,11 @@ impl App {
 
 		if let GuessResult::Correct = guess_result {
 		    self.game_history.push(self.level, self.game.attempts());
-		    self.advance_level();
+		    let did_advance = self.advance_level();
+
+		    if !did_advance {
+			self.finished = true;
+		    }
 		}
 		
 		self.message = Some(Message::from_guess_result(guess_result));
@@ -81,8 +87,12 @@ impl App {
 	}
     }
 
-    fn advance_level(&mut self) {
-	self.level.advance();
-	self.game = Game::new(self.level);
+    fn advance_level(&mut self) -> bool {
+	if self.level.advance() {
+	    self.game = Game::new(self.level);
+	    true
+	} else {
+	    false
+	}
     }
 }

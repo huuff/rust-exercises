@@ -11,10 +11,14 @@ impl GameLevel {
         GameLevel(constants::MAX_INPUT_SIZE)
     }
 
-    pub fn advance(&mut self) {
-	if *self < GameLevel::max() {
-	    *self = GameLevel(self.0 + 1)
+    /// Change into the next level. Returns true if it's possible and false otherwise
+    pub fn advance(&mut self) -> bool {
+	if *self >= GameLevel::max() {
+	    return false;
 	}
+
+	*self = GameLevel(self.0 + 1);
+	true
     }
 
     pub fn max_solution(&self) -> u64 {

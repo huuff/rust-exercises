@@ -15,6 +15,11 @@ use crate::{
 };
 
 pub fn render(f: &mut Frame, app: &App) {
+    if app.finished {
+	render_game_end(f, crate::util::centered_rect(f.size(), 25, 25));
+	return;
+    }
+    
     render_outer_block(f, app);
 
     let vertical_layout = Layout::new(
@@ -147,4 +152,10 @@ fn render_history(f: &mut Frame, app: &App, target_rect: Rect) {
     .block(Block::default().borders(Borders::ALL));
 
     f.render_widget(list, target_rect);
+}
+
+pub fn render_game_end(f: &mut Frame, target_area: Rect) {
+    let p = Paragraph::new("You won the game!");
+
+    f.render_widget(p, target_area);
 }
