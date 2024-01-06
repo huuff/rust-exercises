@@ -2,11 +2,12 @@ mod ui;
 mod event;
 
 use std::collections::HashMap;
-use crossterm::event::{KeyEvent, KeyCode};
+use crossterm::event::KeyCode;
 use event::{EventHandler, Event};
+use strum::{EnumIter, IntoStaticStr};
 
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, EnumIter, IntoStaticStr)]
 pub enum Department {
     Sales,
     Engineering,
