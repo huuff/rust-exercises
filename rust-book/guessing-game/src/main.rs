@@ -22,7 +22,6 @@ use ratatui::{
     Terminal, TerminalOptions, Viewport,
 };
 
-// TODO: Add a debug mode where I can see the current solution so I can test winning
 // TODO: Maybe allow saving the game?
 fn main() -> anyhow::Result<()> {
     enable_raw_mode()?;
@@ -44,6 +43,7 @@ fn main() -> anyhow::Result<()> {
 		app.current_tick += 1;
                 terminal.draw(|f| ui::render(f, &app))?;
             }
+	    // TODO: Maybe move key handling somewhere else
             Event::Key(key) => {
                 match key.code {
                     KeyCode::Char(c) => {
