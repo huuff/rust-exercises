@@ -52,7 +52,7 @@ pub fn render(f: &mut Frame, app: &App) {
     render_history(f, app, bottom_layout[0].offset(Offset { x: 2, y: -1 }));
     render_instructions(f, bottom_layout[2].offset(Offset { x: -2, y: -1 }));
 
-    let debug_area = Rect::new(f.size().width-30, 2, 30, 1);
+    let debug_area = Rect::new(f.size().width-32, 1, 30, 1);
     if app.debug {
 	render_solution(f, debug_area, app)
     }
@@ -171,7 +171,7 @@ pub fn render_solution(f: &mut Frame, target_area: Rect, app: &App) {
 	    format!("Solution: {}", app.game.solution),
 	    Style::new().fg(Color::Yellow),
 	)
-    );
+    ).alignment(Alignment::Right);
 
     f.render_widget(p, target_area);
 }
