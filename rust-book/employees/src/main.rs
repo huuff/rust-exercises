@@ -1,4 +1,10 @@
+mod ui;
+mod event;
+
 use std::collections::HashMap;
+use crossterm::event::{KeyEvent, KeyCode};
+use event::{EventHandler, Event};
+
 
 #[derive(PartialEq, Eq, Hash)]
 pub enum Department {
@@ -14,7 +20,7 @@ pub struct Employee {
 }
 
 #[derive(Default)]
-struct App {
+pub struct App {
     department_to_employees: HashMap<Department, Vec<Employee>>
 }
 
@@ -25,8 +31,29 @@ fn create_initial_employees() -> Vec<Employee> {
     ]
 }
 
-fn main() {
+fn main() -> anyhow::Result<()> {
     let mut app = App::default();
-    // app.department_to_employees[&Department::None] = create_initial_employees();
     app.department_to_employees.insert(Department::None, create_initial_employees());
+    let event_handler = EventHandler::new(16);
+
+    let mut terminal = ui::init_terminal()?;
+
+    loop {
+	match event_handler.next()? {
+	    Event::Tick => {
+		terminal.draw(|frame| ui::render(frame, &app))?;
+	    },
+	    Event::Key(key) => {
+		match key.code {
+		    KeyCode::Char('q') => { break; }
+		    _ => {}
+		}
+	    }
+	    _ => {}
+	}
+    }
+
+    ui::close_terminal()?;
+    Ok(())
 }
+
