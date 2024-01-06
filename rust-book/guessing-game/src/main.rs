@@ -47,14 +47,12 @@ fn main() -> anyhow::Result<()> {
             Event::Key(key) => {
                 match key.code {
                     KeyCode::Char(c) => {
-			if c.is_digit(10) {
-			    app.add_to_input(c);
-			} else if c == 'q' {
-			    break;
-			} else if c == 't' {
-			    app.switch_tab();
-			} else if c == 'd' {
-			    app.debug = !app.debug;
+			match c {
+			    c if c.is_ascii_digit() => { app.add_to_input(c); }
+			    'q' => { break; }
+			    't' => { app.switch_tab(); }
+			    'd' => { app.debug = !app.debug; }
+			    _ => {}
 			}
                     }
 		    KeyCode::Enter => {
