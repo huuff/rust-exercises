@@ -14,7 +14,6 @@ use crate::{
     history::HistoryEntry,
 };
 
-// TODO: Can I make some of these their own "widgets" instead of just making each one a function?
 pub fn render(f: &mut Frame, app: &App) {
     render_outer_block(f, app);
 
