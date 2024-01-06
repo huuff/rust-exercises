@@ -18,6 +18,7 @@ pub struct App {
     pub game_history: History<GameLevel, usize>,
     pub current_tab: HistoryTab,
     pub finished: bool,
+    pub debug: bool,
 }
 
 impl App {
@@ -32,6 +33,7 @@ impl App {
 	    game_history: History::new(),
 	    current_tab: HistoryTab::Guesses,
 	    finished: false,
+	    debug: false,
 	}
     }
 

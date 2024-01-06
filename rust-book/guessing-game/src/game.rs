@@ -5,7 +5,7 @@ use rand::Rng;
 use crate::{history::History, level::GameLevel};
 
 pub struct Game {
-   solution: u64,
+   pub solution: u64,
    pub guess_history: History<u64, GuessResult>,
 }
 

@@ -44,20 +44,17 @@ fn main() -> anyhow::Result<()> {
 		app.current_tick += 1;
                 terminal.draw(|f| ui::render(f, &app))?;
             }
-	    // TODO: Maybe move this key handling somewhere else
             Event::Key(key) => {
                 match key.code {
                     KeyCode::Char(c) => {
 			if c.is_digit(10) {
 			    app.add_to_input(c);
-			}
-
-			if c == 'q' {
+			} else if c == 'q' {
 			    break;
-			}
-
-			if c == 't' {
+			} else if c == 't' {
 			    app.switch_tab();
+			} else if c == 'd' {
+			    app.debug = !app.debug;
 			}
                     }
 		    KeyCode::Enter => {
