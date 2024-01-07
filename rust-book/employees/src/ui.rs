@@ -45,7 +45,9 @@ pub fn render(f: &mut Frame, app: &mut App) {
         Scene::DepartmentList { state, .. } => {
 	    render_derpartment_table(f, &app.department_to_employees, state, center_rect);
 	}
-        Scene::DepartmentView { department } => todo!(),
+        Scene::DepartmentView { department } => {
+	    render_department_view(f, &app.department_to_employees[department], center_rect)
+	},
     }
 }
 
@@ -56,7 +58,6 @@ pub fn render_derpartment_table(
     target_area: Rect,
 ) {
     let widths = [Constraint::default(), Constraint::Length(10)];
-    // TODO: It'd be cool if I could use some &strs here
     let rows = Department::all().iter()
         .map(|department| {
             [
@@ -80,4 +81,27 @@ pub fn render_derpartment_table(
         .segment_size(SegmentSize::EvenDistribution);
 
     f.render_stateful_widget(table, target_area, table_state);
+}
+
+pub fn render_department_view(
+    f: &mut Frame,
+    employees: &HashSet<Employee>,
+    target_area: Rect
+) {
+    let widths = [Constraint::default(), Constraint::Length(10)];
+    let rows = employees.iter()
+        .map(|Employee { name, salary }| [name.clone(), salary.to_string()])
+        .map(|t| Row::new(t));
+
+    let table = Table::new(rows, widths)
+        .header(
+            Row::new(["Employee", "Salary"])
+                .style(Style::new().bold())
+                .add_modifier(Modifier::UNDERLINED),
+        )
+        .block(Block::default().borders(Borders::ALL))
+        .highlight_style(Style::new().on_dark_gray())
+        .segment_size(SegmentSize::EvenDistribution);
+
+    f.render_widget(table, target_area, );
 }

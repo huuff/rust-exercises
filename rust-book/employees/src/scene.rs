@@ -14,10 +14,14 @@ pub enum Scene {
 
 
 impl Scene {
-    pub fn initial() -> Self {
+    pub fn new_department_list() -> Self {
 	Self::DepartmentList {
 	    state: TableState::new().with_selected(Some(0)),
 	} 
+    }
+
+    pub fn new_department_view(department: Department) -> Self {
+	Self::DepartmentView { department }
     }
 
     pub fn next(&mut self) {
@@ -28,7 +32,7 @@ impl Scene {
 		    None => Some(0),
 		})
 	    }
-	    Scene::DepartmentView { department } => todo!(),
+	    Scene::DepartmentView { department: _ } => todo!(),
 	}
     }
 
@@ -40,7 +44,7 @@ impl Scene {
 		    None => Some(0),
 		})
 	    }
-	    Scene::DepartmentView {department } => todo!(),
+	    Scene::DepartmentView {department: _ } => todo!(),
 	}
     }
 }
