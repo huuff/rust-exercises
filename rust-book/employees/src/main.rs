@@ -2,7 +2,8 @@ mod ui;
 mod scene;
 mod event;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use map_macro::hash_set;
 use crossterm::event::KeyCode;
 use event::{EventHandler, Event};
 use scene::Scene;
@@ -20,12 +21,13 @@ pub enum Department {
 
 const DEPARTMENTS: [Department; 5] = [Department::Sales, Department::Engineering, Department::Marketing, Department::Accounting, Department::None];
 
+#[derive(PartialEq, Eq, Hash)]
 pub struct Employee {
     name: String,
 }
 
 pub struct App {
-    department_to_employees: HashMap<Department, Vec<Employee>>,
+    department_to_employees: HashMap<Department, HashSet<Employee>>,
     scene: Scene,
 }
 
@@ -38,11 +40,11 @@ impl App {
     }
 }
 
-fn create_initial_employees() -> Vec<Employee> {
-    vec![
+fn create_initial_employees() -> HashSet<Employee> {
+    hash_set! {
 	Employee { name: "Amir".to_string() },
 	Employee { name: "Sally".to_string() },
-    ]
+    }
 }
 
 fn main() -> anyhow::Result<()> {
@@ -60,8 +62,8 @@ fn main() -> anyhow::Result<()> {
 	    Event::Key(key) => {
 		match key.code {
 		    KeyCode::Char('q') => { break }
-		    KeyCode::Down => {  app.scene.next(DEPARTMENTS.len()-1) }
-		    KeyCode::Up => { app.scene.previous(DEPARTMENTS.len()-1) }
+		    KeyCode::Down => {  app.scene.next() }
+		    KeyCode::Up => { app.scene.previous() }
 		    _ => {}
 		}
 	    }
