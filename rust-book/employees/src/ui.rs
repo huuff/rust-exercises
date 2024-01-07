@@ -1,4 +1,4 @@
-use std::io::{self, Stdout};
+use std::{io::{self, Stdout}, collections::HashMap};
 
 use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -7,11 +7,11 @@ use crossterm::{
 use ratatui::{
     layout::SegmentSize,
     prelude::*,
-    widgets::{Block, Borders, Row, Table},
+    widgets::{Block, Borders, Row, Table, TableState},
 };
 use strum::IntoEnumIterator;
 
-use crate::{App, Department};
+use crate::{App, Department, scene::Scene, Employee};
 
 pub fn init_terminal() -> anyhow::Result<Terminal<CrosstermBackend<Stdout>>> {
     io::stdout().execute(EnterAlternateScreen)?;
@@ -42,17 +42,27 @@ pub fn render(f: &mut Frame, app: &mut App) {
         .segment_size(SegmentSize::EvenDistribution);
 
     let center_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
-    render_derpartment_table(f, app, center_rect);
+    match &mut app.scene {
+        Scene::DepartmentList(table_state) => {
+	    render_derpartment_table(f, &app.department_to_employees, table_state, center_rect);
+	}
+        Scene::EmployeeList => todo!(),
+    }
 }
 
-pub fn render_derpartment_table(f: &mut Frame, app: &mut App, target_area: Rect) {
+pub fn render_derpartment_table(
+    f: &mut Frame,
+    department_to_employees: &HashMap<Department, Vec<Employee>>,
+    table_state: &mut TableState,
+    target_area: Rect,
+) {
     let widths = [Constraint::default(), Constraint::Length(10)];
     // TODO: It'd be cool if I could use some &strs here
     let rows = Department::iter()
         .map(|department| {
             [
                 department.to_string(),
-                app.department_to_employees
+                department_to_employees
                     .get(&department)
                     .map(|employees| employees.len().to_string())
                     .unwrap_or("0".to_string()),
@@ -70,5 +80,5 @@ pub fn render_derpartment_table(f: &mut Frame, app: &mut App, target_area: Rect)
         .highlight_style(Style::new().on_dark_gray())
         .segment_size(SegmentSize::EvenDistribution);
 
-    f.render_stateful_widget(table, target_area, &mut app.table_state);
+    f.render_stateful_widget(table, target_area, table_state);
 }
