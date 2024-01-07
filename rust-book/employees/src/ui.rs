@@ -43,7 +43,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
     let center_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
     match &mut app.scene {
         Scene::DepartmentList { state, .. } => {
-	    render_derpartment_table(f, &app.department_to_employees, state, center_rect);
+	    render_department_table(f, &app.department_to_employees, state, center_rect);
 	}
         Scene::DepartmentView { department } => {
 	    render_department_view(f, &app.department_to_employees[department], center_rect)
@@ -51,7 +51,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
     }
 }
 
-pub fn render_derpartment_table(
+pub fn render_department_table(
     f: &mut Frame,
     department_to_employees: &HashMap<Department, HashSet<Employee>>,
     table_state: &mut TableState,
