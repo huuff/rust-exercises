@@ -50,7 +50,7 @@ pub fn render(f: &mut Frame, app: &App) {
 }
 
 pub fn render_derpartment_table(f: &mut Frame, app: &App, target_area: Rect) {
-    let widths = Constraint::from_lengths([10, 5]);
+    let widths = [Constraint::default(), Constraint::Length(10)];
     // TODO: It'd be cool if I could use some &strs here
     let rows = vec![
 	["Department".to_string(), "Employees".to_string()],
@@ -70,7 +70,7 @@ pub fn render_derpartment_table(f: &mut Frame, app: &App, target_area: Rect) {
         .block(Block::default()
                .title("Departments")
 		.borders(Borders::ALL)
-	);
+	).segment_size(SegmentSize::EvenDistribution);
 
     f.render_widget(table, target_area);
 }
