@@ -1,7 +1,7 @@
 use std::io::{self, Stdout};
 
 use crossterm::{terminal::{EnterAlternateScreen, LeaveAlternateScreen, enable_raw_mode, disable_raw_mode}, ExecutableCommand as _};
-use ratatui::{prelude::*, widgets::{Block, Borders}};
+use ratatui::{prelude::*, widgets::{Block, Borders, Table, Row}, layout::SegmentSize};
 use strum::IntoEnumIterator;
 
 use crate::{App, Department};
@@ -29,8 +29,48 @@ pub fn render(f: &mut Frame, app: &App) {
         .title("Employees")
         .borders(Borders::ALL)
 	;
-
-    // TODO: Actually use this to show a table
-    Department::iter();
     f.render_widget(outer_block, f.size());
+
+    let vertical_layout = Layout::new(
+	Direction::Vertical,
+	Constraint::from_mins([0, 20, 0])
+    )
+        .segment_size(SegmentSize::EvenDistribution)
+	;
+
+    let horizontal_layout = Layout::new(
+	Direction::Horizontal,
+	Constraint::from_mins([0, 20, 0])
+    )
+        .segment_size(SegmentSize::EvenDistribution)
+	;
+
+    let center_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
+    render_derpartment_table(f, app, center_rect);
+}
+
+pub fn render_derpartment_table(f: &mut Frame, app: &App, target_area: Rect) {
+    let widths = Constraint::from_lengths([10, 5]);
+    // TODO: It'd be cool if I could use some &strs here
+    let rows = vec![
+	["Department".to_string(), "Employees".to_string()],
+    ].into_iter().chain(
+	Department::iter().map(|department|
+			       [
+				   department.to_string(),
+				   app.department_to_employees
+					.get(&department)
+					.map(|employees| employees.len().to_string())
+				       .unwrap_or("0".to_string())
+			       ]
+	)
+    ).map(|t| Row::new(t));
+
+    let table = Table::new(rows, widths)
+        .block(Block::default()
+               .title("Departments")
+		.borders(Borders::ALL)
+	);
+
+    f.render_widget(table, target_area);
 }

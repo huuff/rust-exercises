@@ -7,7 +7,7 @@ use event::{EventHandler, Event};
 use strum::{EnumIter, IntoStaticStr};
 
 
-#[derive(PartialEq, Eq, Hash, EnumIter, IntoStaticStr)]
+#[derive(PartialEq, Eq, Hash, EnumIter, IntoStaticStr, Clone, Copy, strum::Display)]
 pub enum Department {
     Sales,
     Engineering,
