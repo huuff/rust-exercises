@@ -9,9 +9,8 @@ use ratatui::{
     prelude::*,
     widgets::{Block, Borders, Row, Table, TableState},
 };
-use strum::IntoEnumIterator;
 
-use crate::{App, Department, scene::Scene, Employee, DEPARTMENTS};
+use crate::{App, Department, scene::Scene, Employee};
 
 pub fn init_terminal() -> anyhow::Result<Terminal<CrosstermBackend<Stdout>>> {
     io::stdout().execute(EnterAlternateScreen)?;
@@ -46,7 +45,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
         Scene::DepartmentList { state, .. } => {
 	    render_derpartment_table(f, &app.department_to_employees, state, center_rect);
 	}
-        Scene::EmployeeList { employees } => todo!(),
+        Scene::DepartmentView { department } => todo!(),
     }
 }
 
@@ -58,7 +57,7 @@ pub fn render_derpartment_table(
 ) {
     let widths = [Constraint::default(), Constraint::Length(10)];
     // TODO: It'd be cool if I could use some &strs here
-    let rows = DEPARTMENTS.iter()
+    let rows = Department::all().iter()
         .map(|department| {
             [
                 department.to_string(),

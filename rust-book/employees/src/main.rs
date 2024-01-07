@@ -21,6 +21,12 @@ pub enum Department {
 
 const DEPARTMENTS: [Department; 5] = [Department::Sales, Department::Engineering, Department::Marketing, Department::Accounting, Department::None];
 
+impl Department {
+    pub fn all() -> &'static [Department; 5] {
+	&DEPARTMENTS
+    }
+}
+
 #[derive(PartialEq, Eq, Hash)]
 pub struct Employee {
     name: String,

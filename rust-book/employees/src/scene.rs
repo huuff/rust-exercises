@@ -1,16 +1,14 @@
-use std::collections::HashSet;
 
 use ratatui::widgets::TableState;
 
-use crate::{Employee, DEPARTMENTS};
+use crate::Department;
 
 pub enum Scene {
     DepartmentList {
 	state: TableState,
-	max: usize,
     },
-    EmployeeList {
-	employees: HashSet<Employee>,
+    DepartmentView {
+	department: Department,
     },
 }
 
@@ -19,31 +17,30 @@ impl Scene {
     pub fn initial() -> Self {
 	Self::DepartmentList {
 	    state: TableState::new().with_selected(Some(0)),
-	    max: DEPARTMENTS.len() - 1, // TODO: Or maybe just put departments here?
 	} 
     }
 
     pub fn next(&mut self) {
 	match self {
-	    Scene::DepartmentList { state, max  } => {
+	    Scene::DepartmentList { state } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(if selected < *max { selected+1 } else { 0 }),
+		    Some(selected) => Some(if selected < Department::all().len()-1 { selected+1 } else { 0 }),
 		    None => Some(0),
 		})
 	    }
-	    Scene::EmployeeList { employees } => todo!(),
+	    Scene::DepartmentView { department } => todo!(),
 	}
     }
 
     pub fn previous(&mut self) {
 	match self {
-	    Scene::DepartmentList { state, max } => {
+	    Scene::DepartmentList { state } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(if selected > 0 { selected-1 } else { *max }),
+		    Some(selected) => Some(if selected > 0 { selected-1 } else { Department::all().len()-1 }),
 		    None => Some(0),
 		})
 	    }
-	    Scene::EmployeeList { employees } => todo!(),
+	    Scene::DepartmentView {department } => todo!(),
 	}
     }
 }
