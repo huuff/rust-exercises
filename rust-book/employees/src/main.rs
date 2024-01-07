@@ -18,6 +18,8 @@ pub enum Department {
     None,
 }
 
+const DEPARTMENTS: [Department; 5] = [Department::Sales, Department::Engineering, Department::Marketing, Department::Accounting, Department::None];
+
 pub struct Employee {
     name: String,
 }
@@ -58,8 +60,8 @@ fn main() -> anyhow::Result<()> {
 	    Event::Key(key) => {
 		match key.code {
 		    KeyCode::Char('q') => { break }
-		    KeyCode::Down => {  app.scene.next() }
-		    KeyCode::Up => { app.scene.previous() }
+		    KeyCode::Down => {  app.scene.next(DEPARTMENTS.len()-1) }
+		    KeyCode::Up => { app.scene.previous(DEPARTMENTS.len()-1) }
 		    _ => {}
 		}
 	    }
