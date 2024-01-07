@@ -64,8 +64,9 @@ pub fn render_derpartment_table(f: &mut Frame, app: &App, target_area: Rect) {
         .header(
             Row::new(["Department", "Employees"])
                 .style(Style::new().bold())
+                .add_modifier(Modifier::UNDERLINED),
         )
-        .block(Block::default().title("Departments").borders(Borders::ALL))
+        .block(Block::default().borders(Borders::ALL))
         .segment_size(SegmentSize::EvenDistribution);
 
     f.render_widget(table, target_area);
