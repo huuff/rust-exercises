@@ -1,15 +1,13 @@
 
-use std::collections::{BTreeSet, HashMap};
 
 use ratatui::widgets::TableState;
 
-use crate::{Department, Employee};
+use crate::{Department, types::{DepartmentToEmployeeMap, EmployeeSet}};
 
-pub type EmployeeSet = BTreeSet<Employee>;
 
 pub enum Scene {
     DepartmentList {
-	department_to_employees: HashMap<Department, EmployeeSet>,
+	department_to_employees: DepartmentToEmployeeMap,
 	state: TableState,
     },
     DepartmentView {
@@ -21,7 +19,7 @@ pub enum Scene {
 
 
 impl Scene {
-    pub fn new_department_list(department_to_employees: HashMap<Department, EmployeeSet>) -> Self {
+    pub fn new_department_list(department_to_employees: DepartmentToEmployeeMap) -> Self {
 	Self::DepartmentList {
 	    department_to_employees,
 	    state: TableState::new().with_selected(Some(0)),

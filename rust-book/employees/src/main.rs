@@ -2,23 +2,24 @@ mod event;
 mod scene;
 mod ui;
 mod models;
+mod types;
 
 use crate::models::{Department, Employee};
 use crossterm::event::KeyCode;
 use event::{Event, EventHandler};
-use scene::{Scene, EmployeeSet};
-use std::collections::HashMap;
-use map_macro::{btree_set, hash_map};
+use scene::Scene;
+use types::{EmployeeSet, DepartmentToEmployeeMap};
+use map_macro::{btree_set, btree_map};
 
 
 pub struct App {
-    department_to_employees: Option<HashMap<Department, EmployeeSet>>,
+    department_to_employees: Option<DepartmentToEmployeeMap>,
     scene: Scene,
 }
 
 impl App {
     pub fn new() -> Self {
-	let department_to_employees = hash_map! {
+	let department_to_employees = btree_map! {
 	    Department::Accounting => EmployeeSet::new(),
 	    Department::Engineering => EmployeeSet::new(),
 	    Department::Marketing => EmployeeSet::new(),
@@ -97,7 +98,7 @@ fn main() -> anyhow::Result<()> {
                         app.scene = match app.scene {
                             Scene::DepartmentList { state, mut department_to_employees } => {
                                 if let Some(selected) = state.selected() {
-                                    let department = Department::all()[selected];
+                                    let department = department_to_employees.keys().nth(selected).map(|it| *it).unwrap();
 				    let employees = (department_to_employees).remove(&department).unwrap();
 				    app.department_to_employees = Some(department_to_employees);
                                     Scene::new_department_view(department, employees)

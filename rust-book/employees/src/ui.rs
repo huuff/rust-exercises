@@ -1,4 +1,4 @@
-use std::{io::{self, Stdout}, collections::HashMap};
+use std::io::{self, Stdout};
 
 use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -10,7 +10,7 @@ use ratatui::{
     widgets::{Block, Borders, Row, Table, TableState},
 };
 
-use crate::{Department, scene::{Scene, EmployeeSet}, Employee};
+use crate::{Department, scene::Scene, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}};
 
 pub fn init_terminal() -> anyhow::Result<Terminal<CrosstermBackend<Stdout>>> {
     io::stdout().execute(EnterAlternateScreen)?;
@@ -53,12 +53,12 @@ pub fn render(f: &mut Frame, scene: &mut Scene) {
 
 pub fn render_department_table(
     f: &mut Frame,
-    department_to_employees: &HashMap<Department, EmployeeSet>,
+    department_to_employees: &DepartmentToEmployeeMap,
     table_state: &mut TableState,
     target_area: Rect,
 ) {
     let widths = [Constraint::default(), Constraint::Length(10)];
-    let rows = Department::all().iter()
+    let rows = department_to_employees.keys()
         .map(|department| {
             [
                 department.to_string(),

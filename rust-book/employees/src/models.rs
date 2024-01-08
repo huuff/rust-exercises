@@ -3,27 +3,13 @@ use std::{hash::{Hasher, Hash}, cmp};
 use strum::{EnumIter, IntoStaticStr};
 
 
-#[derive(PartialEq, Eq, Hash, EnumIter, IntoStaticStr, Clone, Copy, strum::Display)]
+#[derive(PartialEq, Eq, Hash, EnumIter, IntoStaticStr, Clone, Copy, strum::Display, PartialOrd, Ord)]
 pub enum Department {
     Sales,
     Engineering,
     Marketing,
     Accounting,
     None,
-}
-
-const DEPARTMENTS: [Department; 5] = [
-    Department::Sales,
-    Department::Engineering,
-    Department::Marketing,
-    Department::Accounting,
-    Department::None,
-];
-
-impl Department {
-    pub fn all() -> &'static [Department; 5] {
-        &DEPARTMENTS
-    }
 }
 
 pub struct Employee {
