@@ -134,10 +134,11 @@ fn main() -> anyhow::Result<()> {
                             Scene::DepartmentList { state } => {
                                 if let Some(selected) = state.selected() {
                                     let department = Department::all()[selected];
-                                    app.scene = Scene::new_department_view(department)
+				    let employees = app.department_to_employees.remove(&department).unwrap();
+                                    app.scene = Scene::new_department_view(department, employees);
                                 } // TODO: Show some message that some must be selected otherwise
                             }
-                            Scene::DepartmentView { department: _ } => todo!(),
+                            Scene::DepartmentView { .. } => todo!(),
                         }
                     }
                     _ => {}

@@ -45,8 +45,8 @@ pub fn render(f: &mut Frame, app: &mut App) {
         Scene::DepartmentList { state, .. } => {
 	    render_department_table(f, &app.department_to_employees, state, center_rect);
 	}
-        Scene::DepartmentView { department } => {
-	    render_department_view(f, &app.department_to_employees[department], center_rect)
+        Scene::DepartmentView { department, employees, state } => {
+	    render_department_view(f, *department, employees, state,  center_rect)
 	},
     }
 }
@@ -85,7 +85,9 @@ pub fn render_department_table(
 
 pub fn render_department_view(
     f: &mut Frame,
+    department: Department,
     employees: &HashSet<Employee>,
+    state: &mut TableState,
     target_area: Rect
 ) {
     let widths = [Constraint::default(), Constraint::Length(10)];
@@ -103,5 +105,5 @@ pub fn render_department_view(
         .highlight_style(Style::new().on_dark_gray())
         .segment_size(SegmentSize::EvenDistribution);
 
-    f.render_widget(table, target_area, );
+    f.render_stateful_widget(table, target_area, state);
 }
