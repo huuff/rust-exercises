@@ -5,10 +5,10 @@ mod ui;
 use core::hash::Hash;
 use crossterm::event::KeyCode;
 use event::{Event, EventHandler};
-use map_macro::hash_set;
-use scene::Scene;
-use std::{collections::{HashMap, HashSet}, hash::Hasher};
+use scene::{Scene, EmployeeSet};
+use std::{collections::HashMap, hash::Hasher, cmp};
 use strum::{EnumIter, IntoStaticStr};
+use map_macro::{btree_set, hash_map};
 
 // TODO: Extract employee and department stuff somewhere else
 #[derive(PartialEq, Eq, Hash, EnumIter, IntoStaticStr, Clone, Copy, strum::Display)]
@@ -52,22 +52,41 @@ impl PartialEq for Employee {
 }
 impl Eq for Employee { }
 
+impl PartialOrd for Employee {
+    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
+       self.name.partial_cmp(&other.name)
+    }
+}
+
+impl Ord for Employee {
+    fn cmp(&self, other: &Self) -> cmp::Ordering {
+        self.partial_cmp(&other).unwrap()
+    }
+}
+
 pub struct App {
-    department_to_employees: HashMap<Department, HashSet<Employee>>,
+    department_to_employees: Option<HashMap<Department, EmployeeSet>>,
     scene: Scene,
 }
 
 impl App {
     pub fn new() -> Self {
+	let department_to_employees = hash_map! {
+	    Department::Accounting => EmployeeSet::new(),
+	    Department::Engineering => EmployeeSet::new(),
+	    Department::Marketing => EmployeeSet::new(),
+	    Department::Sales => EmployeeSet::new(),
+	    Department::None => create_initial_employees(),
+	};
         Self {
-            department_to_employees: HashMap::new(),
-            scene: Scene::new_department_list(),
+            department_to_employees: None,
+            scene: Scene::new_department_list(department_to_employees),
         }
     }
 }
 
-fn create_initial_employees() -> HashSet<Employee> {
-    hash_set! {
+fn create_initial_employees() -> EmployeeSet {
+    btree_set! {
 	Employee { name: "Steven".to_string(), salary: 24000.00 },
 	Employee { name: "Neena".to_string(), salary: 17000.00 },
 	Employee { name: "Lex".to_string(), salary: 17000.00 },
@@ -113,8 +132,6 @@ fn create_initial_employees() -> HashSet<Employee> {
 
 fn main() -> anyhow::Result<()> {
     let mut app = App::new();
-    app.department_to_employees
-        .insert(Department::None, create_initial_employees());
     let event_handler = EventHandler::new(16);
 
     let mut terminal = ui::init_terminal()?;
@@ -122,7 +139,7 @@ fn main() -> anyhow::Result<()> {
     loop {
         match event_handler.next()? {
             Event::Tick => {
-                terminal.draw(|frame| ui::render(frame, &mut app))?;
+                terminal.draw(|frame| ui::render(frame, &mut app.scene))?;
             }
             Event::Key(key) => {
                 match key.code {
@@ -130,16 +147,23 @@ fn main() -> anyhow::Result<()> {
                     KeyCode::Down => app.scene.next(),
                     KeyCode::Up => app.scene.previous(),
                     KeyCode::Enter => {
-                        match &app.scene {
-                            Scene::DepartmentList { state } => {
+                        app.scene = match app.scene {
+                            Scene::DepartmentList { state, mut department_to_employees } => {
                                 if let Some(selected) = state.selected() {
                                     let department = Department::all()[selected];
-				    let employees = app.department_to_employees.remove(&department).unwrap();
-                                    app.scene = Scene::new_department_view(department, employees);
-                                } // TODO: Show some message that some must be selected otherwise
+				    let employees = (department_to_employees).remove(&department).unwrap();
+				    app.department_to_employees = Some(department_to_employees);
+                                    Scene::new_department_view(department, employees)
+                                } else {
+				    Scene::DepartmentList { state, department_to_employees }
+				} // TODO: Show some message that some must be selected otherwise
                             }
-                            Scene::DepartmentView { .. } => todo!(),
-                        }
+                            Scene::DepartmentView { department, employees, ..  } => {
+				let mut department_to_employees = app.department_to_employees.take().unwrap();
+				department_to_employees.insert(department, employees);
+				Scene::new_department_list(department_to_employees)
+			    }
+                        };
                     }
                     _ => {}
                 }

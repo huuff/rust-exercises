@@ -1,4 +1,4 @@
-use std::{io::{self, Stdout}, collections::{HashMap, HashSet}};
+use std::{io::{self, Stdout}, collections::HashMap};
 
 use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -10,7 +10,7 @@ use ratatui::{
     widgets::{Block, Borders, Row, Table, TableState},
 };
 
-use crate::{App, Department, scene::Scene, Employee};
+use crate::{Department, scene::{Scene, EmployeeSet}, Employee};
 
 pub fn init_terminal() -> anyhow::Result<Terminal<CrosstermBackend<Stdout>>> {
     io::stdout().execute(EnterAlternateScreen)?;
@@ -30,7 +30,7 @@ pub fn close_terminal() -> anyhow::Result<()> {
     Ok(())
 }
 
-pub fn render(f: &mut Frame, app: &mut App) {
+pub fn render(f: &mut Frame, scene: &mut Scene) {
     let outer_block = Block::default().title("Employees").borders(Borders::ALL);
     f.render_widget(outer_block, f.size());
 
@@ -41,9 +41,9 @@ pub fn render(f: &mut Frame, app: &mut App) {
         .segment_size(SegmentSize::EvenDistribution);
 
     let center_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
-    match &mut app.scene {
-        Scene::DepartmentList { state, .. } => {
-	    render_department_table(f, &app.department_to_employees, state, center_rect);
+    match scene {
+        Scene::DepartmentList { state, department_to_employees, .. } => {
+	    render_department_table(f, department_to_employees, state, center_rect);
 	}
         Scene::DepartmentView { department, employees, state } => {
 	    render_department_view(f, *department, employees, state,  center_rect)
@@ -53,7 +53,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
 
 pub fn render_department_table(
     f: &mut Frame,
-    department_to_employees: &HashMap<Department, HashSet<Employee>>,
+    department_to_employees: &HashMap<Department, EmployeeSet>,
     table_state: &mut TableState,
     target_area: Rect,
 ) {
@@ -86,7 +86,7 @@ pub fn render_department_table(
 pub fn render_department_view(
     f: &mut Frame,
     department: Department,
-    employees: &HashSet<Employee>,
+    employees: &EmployeeSet,
     state: &mut TableState,
     target_area: Rect
 ) {

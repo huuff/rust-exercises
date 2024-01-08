@@ -1,30 +1,34 @@
 
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashMap};
 
 use ratatui::widgets::TableState;
 
 use crate::{Department, Employee};
 
+pub type EmployeeSet = BTreeSet<Employee>;
+
 pub enum Scene {
     DepartmentList {
+	department_to_employees: HashMap<Department, EmployeeSet>,
 	state: TableState,
     },
     DepartmentView {
 	department: Department,
-	employees: HashSet<Employee>,
+	employees: EmployeeSet,
 	state: TableState,
     },
 }
 
 
 impl Scene {
-    pub fn new_department_list() -> Self {
+    pub fn new_department_list(department_to_employees: HashMap<Department, EmployeeSet>) -> Self {
 	Self::DepartmentList {
+	    department_to_employees,
 	    state: TableState::new().with_selected(Some(0)),
 	} 
     }
 
-    pub fn new_department_view(department: Department, employees: HashSet<Employee>) -> Self {
+    pub fn new_department_view(department: Department, employees: EmployeeSet) -> Self {
 	Self::DepartmentView {
 	    department,
 	    employees,
@@ -34,9 +38,9 @@ impl Scene {
 
     pub fn next(&mut self) {
 	match self {
-	    Scene::DepartmentList { state } => {
+	    Scene::DepartmentList { state, department_to_employees } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(if selected < Department::all().len()-1 { selected+1 } else { 0 }),
+		    Some(selected) => Some(if selected < department_to_employees.len()-1 { selected+1 } else { 0 }),
 		    None => Some(0),
 		})
 	    }
@@ -51,9 +55,9 @@ impl Scene {
 
     pub fn previous(&mut self) {
 	match self {
-	    Scene::DepartmentList { state } => {
+	    Scene::DepartmentList { state, department_to_employees } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(if selected > 0 { selected-1 } else { Department::all().len()-1 }),
+		    Some(selected) => Some(if selected > 0 { selected-1 } else { department_to_employees.len()-1 }),
 		    None => Some(0),
 		})
 	    }
