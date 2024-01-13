@@ -85,7 +85,7 @@ pub fn render_department_table(
 
 pub fn render_department_view(
     f: &mut Frame,
-    department: &Department, // TODO: Render the name of the department as a block title
+    department: &Department, 
     employees: &EmployeeSet,
     state: &mut TableState,
     target_area: Rect
