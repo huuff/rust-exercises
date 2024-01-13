@@ -2,7 +2,7 @@
 
 use ratatui::widgets::TableState;
 
-use crate::{Department, types::{DepartmentToEmployeeMap, EmployeeSet}};
+use crate::{Department, types::{DepartmentToEmployeeMap, EmployeeSet}, util::Loopable};
 
 
 pub enum Scene {
@@ -38,13 +38,13 @@ impl Scene {
 	match self {
 	    Scene::DepartmentList { state, department_to_employees } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(if selected < department_to_employees.len()-1 { selected+1 } else { 0 }),
+		    Some(selected) => Some(selected.next_in(0..department_to_employees.len()-1)),
 		    None => Some(0),
 		})
 	    }
 	    Scene::DepartmentView { state, employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(if selected < employees.len()-1 { selected+1 } else { 0 }),
+		    Some(selected) => Some(selected.next_in(0..employees.len()-1)),
 		    None => Some(0),
 		})
 	    }
@@ -55,11 +55,16 @@ impl Scene {
 	match self {
 	    Scene::DepartmentList { state, department_to_employees } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(if selected > 0 { selected-1 } else { department_to_employees.len()-1 }),
+		    Some(selected) => Some(selected.previous_in(0..department_to_employees.len()-1)),
 		    None => Some(0),
 		})
 	    }
-	    Scene::DepartmentView { .. } => todo!(),
+	    Scene::DepartmentView { state, employees, .. } => {
+		state.select(match state.selected() {
+		    Some(selected) => Some(selected.previous_in(0..employees.len()-1)),
+		    None => Some(0),
+		})
+	    },
 	}
     }
 }

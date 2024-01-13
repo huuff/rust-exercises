@@ -3,6 +3,7 @@ mod scene;
 mod ui;
 mod models;
 mod types;
+mod util;
 
 use crate::models::{Department, Employee};
 use crossterm::event::KeyCode;
