@@ -51,6 +51,7 @@ pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
     }
 }
 
+// TODO: Try using some department static str funs insteas of to_string
 pub fn render_department_table(
     f: &mut Frame,
     department_to_employees: &DepartmentToEmployeeMap,
@@ -101,7 +102,10 @@ pub fn render_department_view(
                 .style(Style::new().bold())
                 .add_modifier(Modifier::UNDERLINED),
         )
-        .block(Block::default().borders(Borders::ALL))
+        .block(Block::default()
+	       .borders(Borders::ALL)
+	       .title(department.to_string())
+	)
         .highlight_style(Style::new().on_dark_gray())
         .segment_size(SegmentSize::EvenDistribution);
 
