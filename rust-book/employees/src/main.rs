@@ -6,6 +6,8 @@ mod models;
 mod types;
 mod util;
 
+use std::collections::BTreeSet;
+
 use crate::models::{Department, Employee};
 use crossterm::event::KeyCode;
 use data::create_sample_data;
@@ -77,10 +79,9 @@ fn main() -> anyhow::Result<()> {
 								    .enumerate(),
 								    |(i, _)| state.selected().is_some_and(|selected| selected == *i) )
 				    ;
-				// TODO: DANGEROUS UNWRAP
-				let (employee, employees) = (employee.unwrap().1, employees.into_iter().map(|it| it.1));
-				app.department_to_employees.insert(department, employees.collect());
-				app.selected_employee = Some(employee);
+				let employees = employees.into_iter().map(|it| it.1).collect::<BTreeSet<Employee>>();
+				app.department_to_employees.insert(department, employees);
+				app.selected_employee = employee.map(|it| it.1);
 				Scene::new_department_list()
 			    }
                         };
