@@ -7,7 +7,7 @@ use crossterm::{
 use ratatui::{
     layout::SegmentSize,
     prelude::*,
-    widgets::{Block, Borders, Row, Table, TableState, Cell},
+    widgets::{Block, Borders, Row, Table, TableState, Cell, List},
 };
 
 use crate::{Department, scene::Scene, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}, App};
@@ -39,6 +39,9 @@ pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
 
     let horizontal_layout = Layout::new(Direction::Horizontal, Constraint::from_mins([0, 20, 0]))
         .segment_size(SegmentSize::EvenDistribution);
+
+    let bottom_right = horizontal_layout.split(vertical_layout.split(f.size())[2])[2];
+    render_keybindings(f, app, bottom_right);
 
     let center_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
     match scene {
@@ -110,3 +113,24 @@ pub fn render_department_view(
 
     f.render_stateful_widget(table, target_area, state);
 }
+
+pub fn render_keybindings(f: &mut Frame, app: &App, target_area: Rect) {
+    let list_items = vec![
+	"Use arrow keys to move around.".to_string(),
+	"Press q to exit.".to_string(),
+	match &app.selected_employee {
+		Some(employee) => format!("Press enter to move {} here.", employee.name),
+		None => "Press enter to select.".to_string(),
+	}
+    ];
+    
+    let list = List::new(list_items)
+        .block(Block::new()
+	       .title("Keybindings")
+	       .borders(Borders::ALL)
+	)
+	;
+
+
+    f.render_widget(list, target_area);
+} 
