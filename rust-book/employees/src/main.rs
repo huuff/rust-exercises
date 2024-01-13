@@ -77,6 +77,7 @@ fn main() -> anyhow::Result<()> {
 								    .enumerate(),
 								    |(i, _)| state.selected().is_some_and(|selected| selected == *i) )
 				    ;
+				// TODO: DANGEROUS UNWRAP
 				let (employee, employees) = (employee.unwrap().1, employees.into_iter().map(|it| it.1));
 				app.department_to_employees.insert(department, employees.collect());
 				app.selected_employee = Some(employee);
