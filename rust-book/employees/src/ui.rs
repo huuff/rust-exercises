@@ -7,7 +7,7 @@ use crossterm::{
 use ratatui::{
     layout::SegmentSize,
     prelude::*,
-    widgets::{Block, Borders, Row, Table, TableState},
+    widgets::{Block, Borders, Row, Table, TableState, Cell},
 };
 
 use crate::{Department, scene::Scene, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}, App};
@@ -51,7 +51,6 @@ pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
     }
 }
 
-// TODO: Try using some department static str funs insteas of to_string
 pub fn render_department_table(
     f: &mut Frame,
     department_to_employees: &DepartmentToEmployeeMap,
@@ -61,15 +60,15 @@ pub fn render_department_table(
     let widths = [Constraint::default(), Constraint::Length(10)];
     let rows = department_to_employees.keys()
         .map(|department| {
-            [
-                department.to_string(),
+            (
+                department.into(),
                 department_to_employees
                     .get(&department)
                     .map(|employees| employees.len().to_string())
                     .unwrap_or("0".to_string()),
-            ]
+            )
         })
-        .map(|t| Row::new(t));
+        .map(|(department, num_employees): (&'static str, String)| Row::new([Cell::new(department), Cell::new(num_employees)]));
 
     let table = Table::new(rows, widths)
         .header(
@@ -104,7 +103,7 @@ pub fn render_department_view(
         )
         .block(Block::default()
 	       .borders(Borders::ALL)
-	       .title(department.to_string())
+	       .title::<&'static str>(department.into())
 	)
         .highlight_style(Style::new().on_dark_gray())
         .segment_size(SegmentSize::EvenDistribution);
