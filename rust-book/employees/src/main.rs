@@ -37,7 +37,7 @@ impl App {
     }
 }
 
-
+// TODO: Show a legend with keybindings
 fn main() -> anyhow::Result<()> {
     let mut app = App::new(create_sample_data());
     let mut scene = Scene::new_department_list();
