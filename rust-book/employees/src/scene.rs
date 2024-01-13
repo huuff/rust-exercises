@@ -1,69 +1,62 @@
-
-
 use ratatui::widgets::TableState;
 
-use crate::{Department, types::{DepartmentToEmployeeMap, EmployeeSet}, util::Loopable, models::Employee};
+use crate::{Department, util::Loopable, App};
 
 
 pub enum Scene {
     DepartmentList {
-	department_to_employees: DepartmentToEmployeeMap,
-	selected_employee: Option<Employee>,
 	state: TableState,
     },
     DepartmentView {
 	department: Department,
-	employees: EmployeeSet,
 	state: TableState,
     },
 }
 
 
 impl Scene {
-    pub fn new_department_list(department_to_employees: DepartmentToEmployeeMap, selected_employee: Option<Employee>) -> Self {
+    pub fn new_department_list() -> Self {
 	Self::DepartmentList {
-	    department_to_employees,
-	    selected_employee,
 	    state: TableState::new().with_selected(Some(0)),
 	} 
     }
 
-    pub fn new_department_view(department: Department, employees: EmployeeSet) -> Self {
+    pub fn new_department_view(department: Department) -> Self {
 	Self::DepartmentView {
 	    department,
-	    employees,
 	    state: TableState::new().with_selected(Some(0)),
 	}
     }
 
-    pub fn next(&mut self) {
+    // TODO: Moving breaks terribly when the department is empty!
+    pub fn next(&mut self, app: &App) {
 	match self {
-	    Scene::DepartmentList { state, department_to_employees, .. } => {
+	    Scene::DepartmentList { state, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..department_to_employees.len()-1)),
+		    Some(selected) => Some(selected.next_in(0..(app.num_departments()-1))),
 		    None => Some(0),
 		})
 	    }
-	    Scene::DepartmentView { state, employees, .. } => {
+	    Scene::DepartmentView { state, department, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..employees.len()-1)),
+		    Some(selected) => Some(selected.next_in(0..(app.num_employees(department)-1))),
 		    None => Some(0),
 		})
 	    }
 	}
     }
 
-    pub fn previous(&mut self) {
+    pub fn previous(&mut self, app: &App) {
 	match self {
-	    Scene::DepartmentList { state, department_to_employees, .. } => {
+	    Scene::DepartmentList { state, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..department_to_employees.len()-1)),
+		    Some(selected) => Some(selected.previous_in(0..(app.num_departments()-1))),
 		    None => Some(0),
 		})
 	    }
-	    Scene::DepartmentView { state, employees, .. } => {
+	    Scene::DepartmentView { state, department, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..employees.len()-1)),
+		    Some(selected) => Some(selected.previous_in(0..(app.num_employees(department) - 1))),
 		    None => Some(0),
 		})
 	    },

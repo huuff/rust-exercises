@@ -1,4 +1,5 @@
 mod event;
+mod data;
 mod scene;
 mod ui;
 mod models;
@@ -7,81 +8,39 @@ mod util;
 
 use crate::models::{Department, Employee};
 use crossterm::event::KeyCode;
+use data::create_sample_data;
 use event::{Event, EventHandler};
 use scene::Scene;
-use types::{EmployeeSet, DepartmentToEmployeeMap};
-use map_macro::{btree_set, btree_map};
+use types::DepartmentToEmployeeMap;
 use util::extract;
 
 
 pub struct App {
-    department_to_employees: Option<DepartmentToEmployeeMap>,
-    scene: Scene,
+    department_to_employees: DepartmentToEmployeeMap,
+    selected_employee: Option<Employee>,
 }
 
 impl App {
-    pub fn new() -> Self {
-	let department_to_employees = btree_map! {
-	    Department::Accounting => EmployeeSet::new(),
-	    Department::Engineering => EmployeeSet::new(),
-	    Department::Marketing => EmployeeSet::new(),
-	    Department::Sales => EmployeeSet::new(),
-	    Department::None => create_initial_employees(),
-	};
+    pub fn new(initial_staff: DepartmentToEmployeeMap) -> Self {
         Self {
-            department_to_employees: None,
-            scene: Scene::new_department_list(department_to_employees, None),
+	    department_to_employees: initial_staff,
+	    selected_employee: None,
         }
     }
-}
 
-fn create_initial_employees() -> EmployeeSet {
-    btree_set! {
-	Employee { name: "Steven".to_string(), salary: 24000.00 },
-	Employee { name: "Neena".to_string(), salary: 17000.00 },
-	Employee { name: "Lex".to_string(), salary: 17000.00 },
-	Employee { name: "Alexander".to_string(), salary: 9000.00 },
-	Employee { name: "Bruce".to_string(), salary: 6000.00 },
-	Employee { name: "David".to_string(), salary: 4800.00 },
-	Employee { name: "Valli".to_string(), salary: 4800.00 },
-	Employee { name: "Diana".to_string(), salary: 4200.00 },
-	Employee { name: "Nancy".to_string(), salary: 12000.00 },
-	Employee { name: "Daniel".to_string(), salary: 9000.00 },
-	Employee { name: "John".to_string(), salary: 8200.00 },
-	Employee { name: "Ismael".to_string(), salary: 7700.00 },
-	Employee { name: "Jose Manuel".to_string(), salary: 7800.00 },
-	Employee { name: "Luis".to_string(), salary: 6900.00 },
-	Employee { name: "Den".to_string(), salary: 11000.00 },
-	Employee { name: "Alexander".to_string(), salary: 3100.00 },
-	Employee { name: "Shelli".to_string(), salary: 2900.00 },
-	Employee { name: "Sigal".to_string(), salary: 2800.00 },
-	Employee { name: "Guy".to_string(), salary: 2600.00 },
-	Employee { name: "Karen".to_string(), salary: 2500.00 },
-	Employee { name: "Matthew".to_string(), salary: 8000.00 },
-	Employee { name: "Adam".to_string(), salary: 8200.00 },
-	Employee { name: "Payam".to_string(), salary: 7900.00 },
-	Employee { name: "Shanta".to_string(), salary: 6500.00 },
-	Employee { name: "Irene".to_string(), salary: 2700.00 },
-	Employee { name: "John".to_string(), salary: 14000.00 },
-	Employee { name: "Karen".to_string(), salary: 13500.00 },
-	Employee { name: "Jonathon".to_string(), salary: 8600.00 },
-	Employee { name: "Jack".to_string(), salary: 8400.00 },
-	Employee { name: "Kimberely".to_string(), salary: 7000.00 },
-	Employee { name: "Charles".to_string(), salary: 6200.00 },
-	Employee { name: "Sarah".to_string(), salary: 4000.00 },
-	Employee { name: "Britney".to_string(), salary: 3900.00 },
-	Employee { name: "Jennifer".to_string(), salary: 4400.00 },
-	Employee { name: "Michael".to_string(), salary: 13000.00 },
-	Employee { name: "Pat".to_string(), salary: 6000.00 },
-	Employee { name: "Susan".to_string(), salary: 6500.00 },
-	Employee { name: "Hermann".to_string(), salary: 10000.00 },
-	Employee { name: "Shelley".to_string(), salary: 12000.00 },
-	Employee { name: "William".to_string(), salary: 8300.00 },
+    pub fn num_departments(&self) -> usize {
+	self.department_to_employees.len()
+    }
+
+    pub fn num_employees(&self, department: &Department) -> usize {
+	self.department_to_employees[department].len()
     }
 }
 
+
 fn main() -> anyhow::Result<()> {
-    let mut app = App::new();
+    let mut app = App::new(create_sample_data());
+    let mut scene = Scene::new_department_list();
     let event_handler = EventHandler::new(16);
 
     let mut terminal = ui::init_terminal()?;
@@ -89,34 +48,39 @@ fn main() -> anyhow::Result<()> {
     loop {
         match event_handler.next()? {
             Event::Tick => {
-                terminal.draw(|frame| ui::render(frame, &mut app.scene))?;
+                terminal.draw(|frame| ui::render(frame, &mut scene, &app))?;
             }
             Event::Key(key) => {
                 match key.code {
                     KeyCode::Char('q') => break,
-                    KeyCode::Down => app.scene.next(),
-                    KeyCode::Up => app.scene.previous(),
+                    KeyCode::Down => scene.next(&app),
+                    KeyCode::Up => scene.previous(&app),
                     KeyCode::Enter => {
-                        app.scene = match app.scene {
-                            Scene::DepartmentList { state, mut department_to_employees, selected_employee } => {
+                        scene = match scene {
+                            Scene::DepartmentList { state, .. } => {
+				// TODO: Maybe avoid the news?
                                 if let Some(selected) = state.selected() {
-                                    let department = department_to_employees.keys().nth(selected).map(|it| *it).unwrap();
-				    let employees = (department_to_employees).remove(&department).unwrap();
-				    app.department_to_employees = Some(department_to_employees);
-                                    Scene::new_department_view(department, employees)
+                                    let department = *app.department_to_employees.keys().nth(selected).unwrap();
+				    if let Some(selected_employee) = app.selected_employee.take() {
+					app.department_to_employees.get_mut(&department).unwrap().insert(selected_employee);
+					Scene::new_department_list()
+				    } else {
+					Scene::new_department_view(department)
+				    }
                                 } else {
-				    Scene::DepartmentList { state, department_to_employees, selected_employee }
-				} // TODO: Show some message that some must be selected otherwise
+				    Scene::new_department_list() // TODO: Show some message that some must be selected otherwise
+				}
                             }
-                            Scene::DepartmentView { department, employees, state  } => {
+                            Scene::DepartmentView { department, state, ..  } => {
+				let employees = app.department_to_employees.remove(&department).unwrap();
 				let (employee, employees) = extract(employees.into_iter()
 								    .enumerate(),
 								    |(i, _)| state.selected().is_some_and(|selected| selected == *i) )
 				    ;
 				let (employee, employees) = (employee.unwrap().1, employees.into_iter().map(|it| it.1));
-				let mut department_to_employees = app.department_to_employees.take().unwrap();
-				department_to_employees.insert(department, employees.collect());
-				Scene::new_department_list(department_to_employees, Some(employee))
+				app.department_to_employees.insert(department, employees.collect());
+				app.selected_employee = Some(employee);
+				Scene::new_department_list()
 			    }
                         };
                     }

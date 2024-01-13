@@ -10,7 +10,7 @@ use ratatui::{
     widgets::{Block, Borders, Row, Table, TableState},
 };
 
-use crate::{Department, scene::Scene, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}};
+use crate::{Department, scene::Scene, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}, App};
 
 pub fn init_terminal() -> anyhow::Result<Terminal<CrosstermBackend<Stdout>>> {
     io::stdout().execute(EnterAlternateScreen)?;
@@ -30,7 +30,7 @@ pub fn close_terminal() -> anyhow::Result<()> {
     Ok(())
 }
 
-pub fn render(f: &mut Frame, scene: &mut Scene) {
+pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
     let outer_block = Block::default().title("Employees").borders(Borders::ALL);
     f.render_widget(outer_block, f.size());
 
@@ -42,11 +42,11 @@ pub fn render(f: &mut Frame, scene: &mut Scene) {
 
     let center_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
     match scene {
-        Scene::DepartmentList { state, department_to_employees, .. } => {
-	    render_department_table(f, department_to_employees, state, center_rect);
+        Scene::DepartmentList { state, .. } => {
+	    render_department_table(f, &app.department_to_employees, state, center_rect);
 	}
-        Scene::DepartmentView { department, employees, state } => {
-	    render_department_view(f, *department, employees, state,  center_rect)
+        Scene::DepartmentView { department, state } => {
+	    render_department_view(f, department, &app.department_to_employees[department], state,  center_rect)
 	},
     }
 }
@@ -85,7 +85,7 @@ pub fn render_department_table(
 
 pub fn render_department_view(
     f: &mut Frame,
-    department: Department,
+    department: &Department, // TODO: Render the name of the department as a block title
     employees: &EmployeeSet,
     state: &mut TableState,
     target_area: Rect
