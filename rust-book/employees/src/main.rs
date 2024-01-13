@@ -11,6 +11,7 @@ use event::{Event, EventHandler};
 use scene::Scene;
 use types::{EmployeeSet, DepartmentToEmployeeMap};
 use map_macro::{btree_set, btree_map};
+use util::extract;
 
 
 pub struct App {
@@ -29,7 +30,7 @@ impl App {
 	};
         Self {
             department_to_employees: None,
-            scene: Scene::new_department_list(department_to_employees),
+            scene: Scene::new_department_list(department_to_employees, None),
         }
     }
 }
@@ -97,20 +98,25 @@ fn main() -> anyhow::Result<()> {
                     KeyCode::Up => app.scene.previous(),
                     KeyCode::Enter => {
                         app.scene = match app.scene {
-                            Scene::DepartmentList { state, mut department_to_employees } => {
+                            Scene::DepartmentList { state, mut department_to_employees, selected_employee } => {
                                 if let Some(selected) = state.selected() {
                                     let department = department_to_employees.keys().nth(selected).map(|it| *it).unwrap();
 				    let employees = (department_to_employees).remove(&department).unwrap();
 				    app.department_to_employees = Some(department_to_employees);
                                     Scene::new_department_view(department, employees)
                                 } else {
-				    Scene::DepartmentList { state, department_to_employees }
+				    Scene::DepartmentList { state, department_to_employees, selected_employee }
 				} // TODO: Show some message that some must be selected otherwise
                             }
-                            Scene::DepartmentView { department, employees, ..  } => {
+                            Scene::DepartmentView { department, employees, state  } => {
+				let (employee, employees) = extract(employees.into_iter()
+								    .enumerate(),
+								    |(i, _)| state.selected().is_some_and(|selected| selected == *i) )
+				    ;
+				let (employee, employees) = (employee.unwrap().1, employees.into_iter().map(|it| it.1));
 				let mut department_to_employees = app.department_to_employees.take().unwrap();
-				department_to_employees.insert(department, employees);
-				Scene::new_department_list(department_to_employees)
+				department_to_employees.insert(department, employees.collect());
+				Scene::new_department_list(department_to_employees, Some(employee))
 			    }
                         };
                     }

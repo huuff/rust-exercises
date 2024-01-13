@@ -22,3 +22,21 @@ impl Loopable<usize> for usize {
 	}
     }
 }
+
+
+// TODO: Can I make this an extension on iterator?
+pub fn extract<T: Sized>(iter: impl Iterator<Item=T>, f: impl Fn(&T) -> bool) -> (Option<T>, Vec<T>) {
+    let mut extracted: Option<T> = None;
+    let mut rest: Vec<T> = Vec::new();
+
+    for item in iter {
+	if extracted.is_none() && f(&item) {
+	    extracted = Some(item)
+	} else {
+	    rest.push(item);
+	}
+    }
+
+    (extracted, rest)
+}
+
