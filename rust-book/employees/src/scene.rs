@@ -17,30 +17,29 @@ pub enum Scene {
 impl Scene {
     pub fn new_department_list() -> Self {
 	Self::DepartmentList {
-	    state: TableState::new().with_selected(Some(0)),
+	    state: TableState::new().with_selected(None),
 	} 
     }
 
     pub fn new_department_view(department: Department) -> Self {
 	Self::DepartmentView {
 	    department,
-	    state: TableState::new().with_selected(Some(0)),
+	    state: TableState::new().with_selected(None),
 	}
     }
 
-    // TODO: Moving breaks terribly when the department is empty!
     pub fn next(&mut self, app: &App) {
 	match self {
 	    Scene::DepartmentList { state, .. } => {
 		state.select(match state.selected() {
 		    Some(selected) => Some(selected.next_in(0..(app.num_departments()-1))),
-		    None => Some(0),
+		    None => if app.num_departments() != 0 { Some(0) } else { None },
 		})
 	    }
 	    Scene::DepartmentView { state, department, .. } => {
 		state.select(match state.selected() {
 		    Some(selected) => Some(selected.next_in(0..(app.num_employees(department)-1))),
-		    None => Some(0),
+		    None => if app.num_employees(department) != 0 { Some(0) } else { None },
 		})
 	    }
 	}
@@ -51,13 +50,13 @@ impl Scene {
 	    Scene::DepartmentList { state, .. } => {
 		state.select(match state.selected() {
 		    Some(selected) => Some(selected.previous_in(0..(app.num_departments()-1))),
-		    None => Some(0),
+		    None => if app.num_departments() != 0 { Some(0) } else { None },
 		})
 	    }
 	    Scene::DepartmentView { state, department, .. } => {
 		state.select(match state.selected() {
 		    Some(selected) => Some(selected.previous_in(0..(app.num_employees(department) - 1))),
-		    None => Some(0),
+		    None => if app.num_employees(department) != 0 { Some(0) } else { None },
 		})
 	    },
 	}
