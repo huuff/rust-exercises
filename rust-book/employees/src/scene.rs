@@ -1,29 +1,33 @@
 use ratatui::widgets::TableState;
 
-use crate::{Department, util::Loopable, App};
+use crate::{Department, util::Loopable, App, types::EmployeeSet};
 
 
-pub enum Scene {
+// TODO: I added the employees to the DepartmentView... try to also add
+// any necessary state to render it to DepartmentList
+pub enum Scene<'a> {
     DepartmentList {
 	state: TableState,
     },
     DepartmentView {
 	department: Department,
+	employees: &'a EmployeeSet,
 	state: TableState,
     },
 }
 
 
-impl Scene {
+impl<'a> Scene<'a> {
     pub fn new_department_list() -> Self {
 	Self::DepartmentList {
 	    state: TableState::new().with_selected(None),
 	} 
     }
 
-    pub fn new_department_view(department: Department) -> Self {
+    pub fn new_department_view(department: Department, employees: &'a EmployeeSet) -> Self {
 	Self::DepartmentView {
 	    department,
+	    employees,
 	    state: TableState::new().with_selected(None),
 	}
     }
@@ -36,10 +40,10 @@ impl Scene {
 		    None => if app.num_departments() != 0 { Some(0) } else { None },
 		})
 	    }
-	    Scene::DepartmentView { state, department, .. } => {
+	    Scene::DepartmentView { state, employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..(app.num_employees(department)-1))),
-		    None => if app.num_employees(department) != 0 { Some(0) } else { None },
+		    Some(selected) => Some(selected.next_in(0..(employees.len()-1))),
+		    None => if employees.len() != 0 { Some(0) } else { None },
 		})
 	    }
 	}

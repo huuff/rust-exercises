@@ -48,8 +48,8 @@ pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
         Scene::DepartmentList { state, .. } => {
 	    render_department_table(f, &app.department_to_employees, state, center_rect);
 	}
-        Scene::DepartmentView { department, state } => {
-	    render_department_view(f, department, &app.department_to_employees[department], state,  center_rect)
+        Scene::DepartmentView { department, state, employees } => {
+	    render_department_view(f, department, employees, state,  center_rect)
 	},
     }
 }

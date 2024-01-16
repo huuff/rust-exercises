@@ -66,7 +66,7 @@ fn main() -> anyhow::Result<()> {
 					app.department_to_employees.get_mut(&department).unwrap().insert(selected_employee);
 					Scene::new_department_list()
 				    } else {
-					Scene::new_department_view(department)
+					Scene::new_department_view(department, &app.department_to_employees[&department])
 				    }
                                 } else {
 				    Scene::new_department_list() // TODO: Show some message that some must be selected otherwise
