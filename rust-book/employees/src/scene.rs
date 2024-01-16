@@ -3,8 +3,6 @@ use ratatui::widgets::TableState;
 use crate::{Department, util::Loopable, App, types::{EmployeeSet, DepartmentToEmployeeMap}};
 
 
-// TODO: I added the employees to the DepartmentView... try to also add
-// any necessary state to render it to DepartmentList
 pub enum Scene<'a> {
     DepartmentList {
 	state: TableState,
