@@ -7,7 +7,7 @@ pub trait Loopable<T: Ord> {
 
 impl Loopable<usize> for usize {
     fn next_in(self, range: ops::Range<usize>) -> Self {
-	if self == range.end {
+	if self == range.end - 1 {
 	   range.start
 	} else {
 	    self + 1
@@ -16,7 +16,7 @@ impl Loopable<usize> for usize {
 
     fn previous_in(self, range: ops::Range<usize>) -> Self {
 	if self == range.start {
-	    range.end
+	    range.end - 1
 	} else {
 	    self - 1
 	}

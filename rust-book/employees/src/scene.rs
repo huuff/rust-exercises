@@ -36,13 +36,13 @@ impl<'a> Scene<'a> {
 	match self {
 	    Scene::DepartmentList { state, departments_to_employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..(departments_to_employees.len()-1))),
+		    Some(selected) => Some(selected.next_in(0..departments_to_employees.len())),
 		    None => if app.num_departments() != 0 { Some(0) } else { None },
 		})
 	    }
 	    Scene::DepartmentView { state, employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..(employees.len()-1))),
+		    Some(selected) => Some(selected.next_in(0..employees.len())),
 		    None => if employees.len() != 0 { Some(0) } else { None },
 		})
 	    }
@@ -53,13 +53,13 @@ impl<'a> Scene<'a> {
 	match self {
 	    Scene::DepartmentList { state, departments_to_employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..(departments_to_employees.len()-1))),
+		    Some(selected) => Some(selected.previous_in(0..departments_to_employees.len())),
 		    None => if app.num_departments() != 0 { Some(0) } else { None },
 		})
 	    }
-	    Scene::DepartmentView { state, department, employees, .. } => {
+	    Scene::DepartmentView { state, employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..(employees.len()-1))),
+		    Some(selected) => Some(selected.previous_in(0..employees.len())),
 		    None => if employees.len() != 0 { Some(0) } else { None },
 		})
 	    },
