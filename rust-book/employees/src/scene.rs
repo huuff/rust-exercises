@@ -1,6 +1,6 @@
 use ratatui::widgets::TableState;
 
-use crate::{Department, util::Loopable, App, types::EmployeeSet};
+use crate::{Department, util::Loopable, App, types::{EmployeeSet, DepartmentToEmployeeMap}};
 
 
 // TODO: I added the employees to the DepartmentView... try to also add
@@ -8,6 +8,7 @@ use crate::{Department, util::Loopable, App, types::EmployeeSet};
 pub enum Scene<'a> {
     DepartmentList {
 	state: TableState,
+	departments_to_employees: &'a DepartmentToEmployeeMap,
     },
     DepartmentView {
 	department: Department,
@@ -18,8 +19,9 @@ pub enum Scene<'a> {
 
 
 impl<'a> Scene<'a> {
-    pub fn new_department_list() -> Self {
+    pub fn new_department_list(departments_to_employees: &'a DepartmentToEmployeeMap) -> Self {
 	Self::DepartmentList {
+	    departments_to_employees,
 	    state: TableState::new().with_selected(None),
 	} 
     }
@@ -34,9 +36,9 @@ impl<'a> Scene<'a> {
 
     pub fn next(&mut self, app: &App) {
 	match self {
-	    Scene::DepartmentList { state, .. } => {
+	    Scene::DepartmentList { state, departments_to_employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..(app.num_departments()-1))),
+		    Some(selected) => Some(selected.next_in(0..(departments_to_employees.len()-1))),
 		    None => if app.num_departments() != 0 { Some(0) } else { None },
 		})
 	    }
@@ -51,16 +53,16 @@ impl<'a> Scene<'a> {
 
     pub fn previous(&mut self, app: &App) {
 	match self {
-	    Scene::DepartmentList { state, .. } => {
+	    Scene::DepartmentList { state, departments_to_employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..(app.num_departments()-1))),
+		    Some(selected) => Some(selected.previous_in(0..(departments_to_employees.len()-1))),
 		    None => if app.num_departments() != 0 { Some(0) } else { None },
 		})
 	    }
-	    Scene::DepartmentView { state, department, .. } => {
+	    Scene::DepartmentView { state, department, employees, .. } => {
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..(app.num_employees(department) - 1))),
-		    None => if app.num_employees(department) != 0 { Some(0) } else { None },
+		    Some(selected) => Some(selected.previous_in(0..(employees.len()-1))),
+		    None => if employees.len() != 0 { Some(0) } else { None },
 		})
 	    },
 	}

@@ -41,7 +41,7 @@ impl App {
 
 fn main() -> anyhow::Result<()> {
     let mut app = App::new(create_sample_data());
-    let mut scene = Scene::new_department_list();
+    let mut scene = Scene::new_department_list(&app.department_to_employees);
     let event_handler = EventHandler::new(16);
 
     let mut terminal = ui::init_terminal()?;
@@ -64,12 +64,13 @@ fn main() -> anyhow::Result<()> {
                                     let department = *app.department_to_employees.keys().nth(selected).unwrap();
 				    if let Some(selected_employee) = app.selected_employee.take() {
 					app.department_to_employees.get_mut(&department).unwrap().insert(selected_employee);
-					Scene::new_department_list()
+					Scene::new_department_list(&app.department_to_employees)
 				    } else {
 					Scene::new_department_view(department, &app.department_to_employees[&department])
 				    }
                                 } else {
-				    Scene::new_department_list() // TODO: Show some message that some must be selected otherwise
+				    Scene::new_department_list(&app.department_to_employees)
+				    // TODO: Show some message that some must be selected otherwise
 				}
                             }
                             Scene::DepartmentView { department, state, ..  } => {
@@ -81,7 +82,7 @@ fn main() -> anyhow::Result<()> {
 				let employees = employees.into_iter().map(|it| it.1).collect::<BTreeSet<Employee>>();
 				app.department_to_employees.insert(department, employees);
 				app.selected_employee = employee.map(|it| it.1);
-				Scene::new_department_list()
+				Scene::new_department_list(&app.department_to_employees)
 			    }
                         };
                     }
