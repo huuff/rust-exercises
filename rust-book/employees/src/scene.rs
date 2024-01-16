@@ -14,6 +14,12 @@ impl<'a> DepartmentList<'a> {
 	    state: TableState::new().with_selected(if !departments_to_employees.is_empty() { Some(0) } else { None }),
 	} 
     }
+
+    pub fn selected(&self) -> Option<Department> {
+	self.state.selected().map(|selected| {
+	    *self.departments_to_employees.keys().nth(selected).unwrap()
+	})
+    }
 }
 
 pub struct DepartmentView<'a> {
@@ -27,7 +33,7 @@ impl<'a> DepartmentView<'a> {
 	DepartmentView {
 	    department,
 	    employees,
-	    state: TableState::new().with_selected(if employees.is_empty() { Some(0) } else { None }),
+	    state: TableState::new().with_selected(if !employees.is_empty() { Some(0) } else { None }),
 	}
     }
 }
@@ -39,8 +45,6 @@ pub enum Scene<'a> {
 }
 
 impl<'a> Scene<'a> {
-
-
     pub fn next(&mut self) {
 	let len = self.table_len();
 	let state = self.state();
@@ -55,7 +59,7 @@ impl<'a> Scene<'a> {
 
     fn table_len(&self) -> usize {
 	match self {
-	    Scene::List(DepartmentList {  departments_to_employees, ..  }) => departments_to_employees.len(),
+	    Scene::List(DepartmentList { departments_to_employees, ..  }) => departments_to_employees.len(),
 	    Scene::View(DepartmentView { employees, .. }) => employees.len(),
 	}
     }

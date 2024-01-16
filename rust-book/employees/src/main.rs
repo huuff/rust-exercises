@@ -57,23 +57,18 @@ fn main() -> anyhow::Result<()> {
                 KeyCode::Up => scene.previous(),
                 KeyCode::Enter => {
                     match scene {
-                        Scene::List(DepartmentList { ref state, .. }) => {
-                            if let None = state.selected() {
-                                continue;
-                            };
-
-                            let selected = state.selected().unwrap();
-                            let department =
-                                *app.department_to_employees.keys().nth(selected).unwrap();
-                            scene = if let Some(selected_employee) = app.selected_employee.take() {
-				app.add_employee(&department, selected_employee);
-				Scene::List(DepartmentList::new(&app.department_to_employees))
-                            } else {
-				Scene::View(DepartmentView::new(
-                                    department,
-                                    &app.department_to_employees[&department],
-                                ))
-                            };
+                        Scene::List( ref list_scene ) => {
+			    match (list_scene.selected(), app.selected_employee.take()) {
+				(Some(department), Some(employee)) => {
+				    app.add_employee(&department, employee);
+				    scene = Scene::List(DepartmentList::new(&app.department_to_employees));
+				}
+				(Some(department), None) => {
+				    let employees = &app.department_to_employees[&department];
+				    scene = Scene::View(DepartmentView::new(department, employees));
+				}
+				_ => {}
+			    };
                         }
                         Scene::View(
                             DepartmentView { department, state, .. }
