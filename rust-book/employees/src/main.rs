@@ -39,6 +39,7 @@ impl App {
     }
 }
 
+// TODO: Some keybinding to cancel the employee move
 fn main() -> anyhow::Result<()> {
     let mut app = App::new(create_sample_data());
     let mut scene = Scene::new_department_list(&app.department_to_employees);
@@ -70,7 +71,6 @@ fn main() -> anyhow::Result<()> {
 				    }
                                 } else {
 				    Scene::new_department_list(&app.department_to_employees)
-				    // TODO: Show some message that some must be selected otherwise
 				}
                             }
                             Scene::DepartmentView { department, state, ..  } => {
