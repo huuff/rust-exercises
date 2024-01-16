@@ -10,7 +10,7 @@ use ratatui::{
     widgets::{Block, Borders, Row, Table, TableState, Cell, List},
 };
 
-use crate::{Department, scene::Scene, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}, App};
+use crate::{Department, scene::{Scene, DepartmentList, DepartmentView}, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}, App};
 
 pub fn init_terminal() -> anyhow::Result<Terminal<CrosstermBackend<Stdout>>> {
     io::stdout().execute(EnterAlternateScreen)?;
@@ -45,10 +45,10 @@ pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
 
     let center_rect = horizontal_layout.split(vertical_layout.split(f.size())[1])[1];
     match scene {
-        Scene::DepartmentList { departments_to_employees, state, .. } => {
+        Scene::List(DepartmentList { departments_to_employees, state, .. }) => {
 	    render_department_table(f, departments_to_employees, state, center_rect);
 	}
-        Scene::DepartmentView { department, state, employees } => {
+        Scene::View(DepartmentView { department, state, employees }) => {
 	    render_department_view(f, department, employees, state,  center_rect)
 	},
     }

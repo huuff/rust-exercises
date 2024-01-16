@@ -2,35 +2,44 @@ use ratatui::widgets::TableState;
 
 use crate::{Department, util::Loopable, types::{EmployeeSet, DepartmentToEmployeeMap}};
 
+pub struct DepartmentList<'a> {
+    pub state: TableState,
+    pub departments_to_employees: &'a DepartmentToEmployeeMap,
+}
 
-pub enum Scene<'a> {
-    DepartmentList {
-	state: TableState,
-	departments_to_employees: &'a DepartmentToEmployeeMap,
-    },
-    DepartmentView {
-	department: Department,
-	employees: &'a EmployeeSet,
-	state: TableState,
-    },
+impl<'a> DepartmentList<'a> {
+    pub fn new(departments_to_employees: &'a DepartmentToEmployeeMap) -> Self {
+	DepartmentList {
+	    departments_to_employees,
+	    state: TableState::new().with_selected(if !departments_to_employees.is_empty() { Some(0) } else { None }),
+	} 
+    }
+}
+
+pub struct DepartmentView<'a> {
+    pub department: Department,
+    pub employees: &'a EmployeeSet,
+    pub state: TableState,
+}
+
+impl<'a> DepartmentView<'a> {
+    pub fn new(department: Department, employees: &'a EmployeeSet) -> Self {
+	DepartmentView {
+	    department,
+	    employees,
+	    state: TableState::new().with_selected(if employees.is_empty() { Some(0) } else { None }),
+	}
+    }
 }
 
 
-impl<'a> Scene<'a> {
-    pub fn new_department_list(departments_to_employees: &'a DepartmentToEmployeeMap) -> Self {
-	Self::DepartmentList {
-	    departments_to_employees,
-	    state: TableState::new().with_selected(if departments_to_employees.len() != 0 { Some(0) } else { None }),
-	} 
-    }
+pub enum Scene<'a> {
+    List(DepartmentList<'a>),
+    View(DepartmentView<'a>),
+}
 
-    pub fn new_department_view(department: Department, employees: &'a EmployeeSet) -> Self {
-	Self::DepartmentView {
-	    department,
-	    employees,
-	    state: TableState::new().with_selected(if employees.len() != 0 { Some(0) } else { None }),
-	}
-    }
+impl<'a> Scene<'a> {
+
 
     pub fn next(&mut self) {
 	let len = self.table_len();
@@ -46,15 +55,15 @@ impl<'a> Scene<'a> {
 
     fn table_len(&self) -> usize {
 	match self {
-	    Scene::DepartmentList { departments_to_employees, .. } => departments_to_employees.len(),
-	    Scene::DepartmentView { employees, .. } => employees.len(),
+	    Scene::List(DepartmentList {  departments_to_employees, ..  }) => departments_to_employees.len(),
+	    Scene::View(DepartmentView { employees, .. }) => employees.len(),
 	}
     }
 
     fn state(&mut self) -> &mut TableState {
 	match self {
-	    Scene::DepartmentList { state, ..} => state,
-	    Scene::DepartmentView { state , .. } => state,
+	    Scene::List(DepartmentList { state, .. }) => state,
+	    Scene::View(DepartmentView { state , .. }) => state,
 	}
     }
 }

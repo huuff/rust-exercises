@@ -12,7 +12,7 @@ use crate::models::{Department, Employee};
 use crossterm::event::KeyCode;
 use data::create_sample_data;
 use event::{Event, EventHandler};
-use scene::Scene;
+use scene::{Scene, DepartmentList, DepartmentView};
 use types::DepartmentToEmployeeMap;
 use util::extract;
 
@@ -41,7 +41,7 @@ impl App {
 // TODO: Some keybinding to cancel the employee move
 fn main() -> anyhow::Result<()> {
     let mut app = App::new(create_sample_data());
-    let mut scene = Scene::new_department_list(&app.department_to_employees);
+    let mut scene = Scene::List(DepartmentList::new(&app.department_to_employees));
     let event_handler = EventHandler::new(16);
 
     let mut terminal = ui::init_terminal()?;
@@ -57,7 +57,7 @@ fn main() -> anyhow::Result<()> {
                 KeyCode::Up => scene.previous(),
                 KeyCode::Enter => {
                     match scene {
-                        Scene::DepartmentList { ref state, .. } => {
+                        Scene::List(DepartmentList { ref state, .. }) => {
                             if let None = state.selected() {
                                 continue;
                             };
@@ -67,17 +67,17 @@ fn main() -> anyhow::Result<()> {
                                 *app.department_to_employees.keys().nth(selected).unwrap();
                             scene = if let Some(selected_employee) = app.selected_employee.take() {
 				app.add_employee(&department, selected_employee);
-                                Scene::new_department_list(&app.department_to_employees)
+				Scene::List(DepartmentList::new(&app.department_to_employees))
                             } else {
-                                Scene::new_department_view(
+				Scene::View(DepartmentView::new(
                                     department,
                                     &app.department_to_employees[&department],
-                                )
+                                ))
                             };
                         }
-                        Scene::DepartmentView {
-                            department, state, ..
-                        } => {
+                        Scene::View(
+                            DepartmentView { department, state, .. }
+                        ) => {
                             let employees =
                                 app.department_to_employees.remove(&department).unwrap();
                             let (employee, employees) =
@@ -90,7 +90,7 @@ fn main() -> anyhow::Result<()> {
                                 .collect::<BTreeSet<Employee>>();
                             app.department_to_employees.insert(department, employees);
                             app.selected_employee = employee.map(|it| it.1);
-                            scene = Scene::new_department_list(&app.department_to_employees);
+			    scene = Scene::List(DepartmentList::new(&app.department_to_employees));
                         }
                     };
                 }
