@@ -54,8 +54,8 @@ fn main() -> anyhow::Result<()> {
             Event::Key(key) => {
                 match key.code {
                     KeyCode::Char('q') => break,
-                    KeyCode::Down => scene.next(&app),
-                    KeyCode::Up => scene.previous(&app),
+                    KeyCode::Down => scene.next(),
+                    KeyCode::Up => scene.previous(),
                     KeyCode::Enter => {
                         scene = match scene {
                             Scene::DepartmentList { state, .. } => {

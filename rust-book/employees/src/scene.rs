@@ -32,35 +32,39 @@ impl<'a> Scene<'a> {
 	}
     }
 
-    pub fn next(&mut self, app: &App) {
+    pub fn next(&mut self) {
 	match self {
 	    Scene::DepartmentList { state, departments_to_employees, .. } => {
+		let num_departments = departments_to_employees.len();
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..departments_to_employees.len())),
-		    None => if app.num_departments() != 0 { Some(0) } else { None },
+		    Some(selected) => Some(selected.next_in(0..num_departments)),
+		    None => if num_departments != 0 { Some(0) } else { None },
 		})
 	    }
 	    Scene::DepartmentView { state, employees, .. } => {
+		let num_employees = employees.len();
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.next_in(0..employees.len())),
-		    None => if employees.len() != 0 { Some(0) } else { None },
+		    Some(selected) => Some(selected.next_in(0..num_employees)),
+		    None => if num_employees != 0 { Some(0) } else { None },
 		})
 	    }
 	}
     }
 
-    pub fn previous(&mut self, app: &App) {
+    pub fn previous(&mut self) {
 	match self {
 	    Scene::DepartmentList { state, departments_to_employees, .. } => {
+		let num_departments = departments_to_employees.len();
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..departments_to_employees.len())),
-		    None => if app.num_departments() != 0 { Some(0) } else { None },
+		    Some(selected) => Some(selected.previous_in(0..num_departments)),
+		    None => if num_departments != 0 { Some(0) } else { None },
 		})
 	    }
 	    Scene::DepartmentView { state, employees, .. } => {
+		let num_employees = employees.len();
 		state.select(match state.selected() {
-		    Some(selected) => Some(selected.previous_in(0..employees.len())),
-		    None => if employees.len() != 0 { Some(0) } else { None },
+		    Some(selected) => Some(selected.previous_in(0..num_employees)),
+		    None => if num_employees != 0 { Some(0) } else { None },
 		})
 	    },
 	}
