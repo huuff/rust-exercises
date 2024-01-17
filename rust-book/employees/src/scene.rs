@@ -1,6 +1,6 @@
 use ratatui::widgets::TableState;
 
-use crate::{Department, util::Loopable, types::{EmployeeSet, DepartmentToEmployeeMap}};
+use crate::{Department, util::Loopable, types::{EmployeeSet, DepartmentToEmployeeMap}, models::Employee};
 
 pub struct DepartmentList<'a> {
     pub state: TableState,
@@ -35,6 +35,12 @@ impl<'a> DepartmentView<'a> {
 	    employees,
 	    state: TableState::new().with_selected(if !employees.is_empty() { Some(0) } else { None }),
 	}
+    }
+
+    pub fn selected(&self) -> Option<&Employee> {
+	self.state.selected().and_then(|selected| {
+	    self.employees.iter().nth(selected)
+	})
     }
 }
 

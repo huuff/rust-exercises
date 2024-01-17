@@ -36,6 +36,13 @@ impl App {
 	    .insert(employee);
     }
 
+    pub fn select_employee(&mut self, department: &Department, employee: &Employee) {
+	self.selected_employee = self.department_to_employees
+	    .get_mut(department)
+	    .unwrap()
+	    .take(employee);
+    }
+
 }
 
 // TODO: Some keybinding to cancel the employee move
@@ -56,36 +63,38 @@ fn main() -> anyhow::Result<()> {
                 KeyCode::Down => scene.next(),
                 KeyCode::Up => scene.previous(),
                 KeyCode::Enter => {
-                    match scene {
-                        Scene::List( ref list_scene ) => {
+                    scene = match scene {
+                        Scene::List( list_scene ) => {
 			    match (list_scene.selected(), app.selected_employee.take()) {
 				(Some(department), Some(employee)) => {
 				    app.add_employee(&department, employee);
-				    scene = Scene::List(DepartmentList::new(&app.department_to_employees));
+				    Scene::List(DepartmentList::new(&app.department_to_employees))
 				}
 				(Some(department), None) => {
 				    let employees = &app.department_to_employees[&department];
-				    scene = Scene::View(DepartmentView::new(department, employees));
+				    Scene::View(DepartmentView::new(department, employees))
 				}
-				_ => {}
-			    };
+				_ => Scene::List(list_scene)
+			    }
                         }
-                        Scene::View(
-                            DepartmentView { department, state, .. }
-                        ) => {
-                            let employees =
-                                app.department_to_employees.remove(&department).unwrap();
-                            let (employee, employees) =
-                                extract(employees.into_iter().enumerate(), |(i, _)| {
-                                    state.selected().is_some_and(|selected| selected == *i)
-                                });
-                            let employees = employees
-                                .into_iter()
-                                .map(|it| it.1)
-                                .collect::<BTreeSet<Employee>>();
-                            app.department_to_employees.insert(department, employees);
-                            app.selected_employee = employee.map(|it| it.1);
-			    scene = Scene::List(DepartmentList::new(&app.department_to_employees));
+                        Scene::View(view_scene) => {
+                            // let employees =
+                            //     app.department_to_employees.remove(&department).unwrap();
+                            // let (employee, employees) =
+                            //     extract(employees.into_iter().enumerate(), |(i, _)| {
+                            //         state.selected().is_some_and(|selected| selected == *i)
+                            //     });
+                            // let employees = employees
+                            //     .into_iter()
+                            //     .map(|it| it.1)
+                            //     .collect::<BTreeSet<Employee>>();
+                            // app.department_to_employees.insert(department, employees);
+                            // app.selected_employee = employee.map(|it| it.1);
+			    if let Some(selected_employee) = view_scene.selected() {
+				let department = view_scene.department;
+				app.select_employee(&department, selected_employee);
+			    }
+			    Scene::List(DepartmentList::new(&app.department_to_employees))
                         }
                     };
                 }
