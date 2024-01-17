@@ -6,15 +6,12 @@ mod types;
 mod ui;
 mod util;
 
-use std::collections::BTreeSet;
-
 use crate::models::{Department, Employee};
 use crossterm::event::KeyCode;
 use data::create_sample_data;
 use event::{Event, EventHandler};
 use scene::{Scene, DepartmentList, DepartmentView};
 use types::DepartmentToEmployeeMap;
-use util::extract;
 
 pub struct App {
     department_to_employees: DepartmentToEmployeeMap,
@@ -78,18 +75,6 @@ fn main() -> anyhow::Result<()> {
 			    }
                         }
                         Scene::View(view_scene) => {
-                            // let employees =
-                            //     app.department_to_employees.remove(&department).unwrap();
-                            // let (employee, employees) =
-                            //     extract(employees.into_iter().enumerate(), |(i, _)| {
-                            //         state.selected().is_some_and(|selected| selected == *i)
-                            //     });
-                            // let employees = employees
-                            //     .into_iter()
-                            //     .map(|it| it.1)
-                            //     .collect::<BTreeSet<Employee>>();
-                            // app.department_to_employees.insert(department, employees);
-                            // app.selected_employee = employee.map(|it| it.1);
 			    if let Some(selected_employee) = view_scene.selected() {
 				let department = view_scene.department;
 				app.select_employee(&department, selected_employee);
