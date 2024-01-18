@@ -2,49 +2,33 @@ mod data;
 mod event;
 mod models;
 mod scene;
-mod types;
 mod ui;
 mod util;
+mod types;
 
 use crate::models::{Department, Employee};
 use crossterm::event::KeyCode;
-use data::create_sample_data;
+use data::EmployeeDb;
 use event::{Event, EventHandler};
 use scene::{Scene, DepartmentList, DepartmentView};
-use types::DepartmentToEmployeeMap;
 
 pub struct App {
-    department_to_employees: DepartmentToEmployeeMap,
+    employee_db: EmployeeDb,
     selected_employee: Option<Employee>,
 }
 
 impl App {
-    pub fn new(initial_staff: DepartmentToEmployeeMap) -> Self {
+    pub fn new() -> Self {
         Self {
-            department_to_employees: initial_staff,
+	    employee_db: EmployeeDb::new(),
             selected_employee: None,
         }
     }
-
-    pub fn add_employee(&mut self, department: &Department, employee: Employee) {
-	self.department_to_employees
-	    .get_mut(department)
-	    .unwrap()
-	    .insert(employee);
-    }
-
-    pub fn select_employee(&mut self, department: &Department, employee: &Employee) {
-	self.selected_employee = self.department_to_employees
-	    .get_mut(department)
-	    .unwrap()
-	    .take(employee);
-    }
-
 }
 
 // TODO: Some keybinding to cancel the employee move
 fn main() -> anyhow::Result<()> {
-    let mut app = App::new(create_sample_data());
+    let mut app = App::new();
     let mut scene = Scene::List(DepartmentList::new(&app.department_to_employees));
     let event_handler = EventHandler::new(16);
 
@@ -64,7 +48,7 @@ fn main() -> anyhow::Result<()> {
                         Scene::List( list_scene ) => {
 			    match (list_scene.selected(), app.selected_employee.take()) {
 				(Some(department), Some(employee)) => {
-				    app.add_employee(&department, employee);
+				    //app.add_employee(&department, employee);
 				    Scene::List(DepartmentList::new(&app.department_to_employees))
 				}
 				(Some(department), None) => {

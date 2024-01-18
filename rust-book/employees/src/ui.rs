@@ -1,4 +1,4 @@
-use std::io::{self, Stdout};
+use std::{io::{self, Stdout}, collections::HashMap};
 
 use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -10,7 +10,7 @@ use ratatui::{
     widgets::{Block, Borders, Row, Table, TableState, Cell, List},
 };
 
-use crate::{Department, scene::{Scene, DepartmentList, DepartmentView}, Employee, types::{EmployeeSet, DepartmentToEmployeeMap}, App};
+use crate::{Department, scene::{Scene, DepartmentList, DepartmentView}, Employee, App};
 
 pub fn init_terminal() -> anyhow::Result<Terminal<CrosstermBackend<Stdout>>> {
     io::stdout().execute(EnterAlternateScreen)?;
@@ -30,7 +30,7 @@ pub fn close_terminal() -> anyhow::Result<()> {
     Ok(())
 }
 
-pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
+pub fn render<'a, T: Iterator<Item=&'a Employee>>(f: &mut Frame, scene: &mut Scene<'a, T>, app: &App) {
     let outer_block = Block::default().title("Employees").borders(Borders::ALL);
     f.render_widget(outer_block, f.size());
 
@@ -56,21 +56,13 @@ pub fn render(f: &mut Frame, scene: &mut Scene, app: &App) {
 
 pub fn render_department_table(
     f: &mut Frame,
-    department_to_employees: &DepartmentToEmployeeMap,
+    department_to_employees: &HashMap<Department, u32>,
     table_state: &mut TableState,
     target_area: Rect,
 ) {
     let widths = [Constraint::default(), Constraint::Length(10)];
-    let rows = department_to_employees.keys()
-        .map(|department| {
-            (
-                department.into(),
-                department_to_employees
-                    .get(&department)
-                    .map(|employees| employees.len().to_string())
-                    .unwrap_or("0".to_string()),
-            )
-        })
+    let rows = department_to_employees
+        .iter()
         .map(|(department, num_employees): (&'static str, String)| Row::new([Cell::new(department), Cell::new(num_employees)]));
 
     let table = Table::new(rows, widths)
@@ -86,16 +78,17 @@ pub fn render_department_table(
     f.render_stateful_widget(table, target_area, table_state);
 }
 
-pub fn render_department_view(
+pub fn render_department_view<'a, T: Iterator<Item=&'a Employee>>(
     f: &mut Frame,
     department: &Department, 
-    employees: &EmployeeSet,
+    employees: T,
     state: &mut TableState,
     target_area: Rect
 ) {
     let widths = [Constraint::default(), Constraint::Length(10)];
     let rows = employees.iter()
-        .map(|Employee { name, salary }| [name.clone(), salary.to_string()])
+	// TODO: Maybe add id
+        .map(|Employee { name, salary, .. }| [name.clone(), salary.to_string()])
         .map(|t| Row::new(t));
 
     let table = Table::new(rows, widths)

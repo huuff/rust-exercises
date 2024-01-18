@@ -93,7 +93,9 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "crossterm",
+ "itertools",
  "map-macro",
+ "once_cell",
  "ratatui",
  "strum",
 ]

@@ -1,56 +1,50 @@
+use std::collections::HashMap;
+use itertools::Itertools as _;
+
 use ratatui::widgets::TableState;
 
-use crate::{Department, util::Loopable, types::{EmployeeSet, DepartmentToEmployeeMap}, models::Employee};
+use crate::{Department, util::Loopable, models::Employee, data::EmployeeDb};
 
-pub struct DepartmentList<'a> {
+pub struct DepartmentList {
     pub state: TableState,
-    pub departments_to_employees: &'a DepartmentToEmployeeMap,
+    pub departments_to_employees: HashMap<Department, u32>,
 }
 
-impl<'a> DepartmentList<'a> {
-    pub fn new(departments_to_employees: &'a DepartmentToEmployeeMap) -> Self {
+impl DepartmentList {
+    pub fn new(employee_db: &EmployeeDb) -> Self {
+	let departments_to_employees = employee_db.find_all()
+	    .group_by(|e| e.department)
+	    ;
 	DepartmentList {
 	    departments_to_employees,
 	    state: TableState::new().with_selected(if !departments_to_employees.is_empty() { Some(0) } else { None }),
 	} 
     }
-
-    pub fn selected(&self) -> Option<Department> {
-	self.state.selected().map(|selected| {
-	    *self.departments_to_employees.keys().nth(selected).unwrap()
-	})
-    }
 }
 
-pub struct DepartmentView<'a> {
+pub struct DepartmentView<'a, T: Iterator<Item=&'a Employee>> {
     pub department: Department,
-    pub employees: &'a EmployeeSet,
+    pub employees: T,
     pub state: TableState,
 }
 
-impl<'a> DepartmentView<'a> {
-    pub fn new(department: Department, employees: &'a EmployeeSet) -> Self {
+impl<'a, T: Iterator<Item=&'a Employee>> DepartmentView<'a, T> {
+    pub fn new(department: Department, employees: T) -> Self {
 	DepartmentView {
 	    department,
 	    employees,
 	    state: TableState::new().with_selected(if !employees.is_empty() { Some(0) } else { None }),
 	}
     }
-
-    pub fn selected(&self) -> Option<&Employee> {
-	self.state.selected().and_then(|selected| {
-	    self.employees.iter().nth(selected)
-	})
-    }
 }
 
 
-pub enum Scene<'a> {
-    List(DepartmentList<'a>),
-    View(DepartmentView<'a>),
+pub enum Scene<'a, T: Iterator<Item=&'a Employee>> {
+    List(DepartmentList),
+    View(DepartmentView<'a, T>),
 }
 
-impl<'a> Scene<'a> {
+impl<'a, T: Iterator<Item=&'a Employee>> Scene<'a, T> {
     pub fn next(&mut self) {
 	let len = self.table_len();
 	let state = self.state();

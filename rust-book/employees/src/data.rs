@@ -1,57 +1,71 @@
-use map_macro::{btree_map, btree_set};
+use std::collections::HashMap;
 
-use crate::{
-    models::{Department, Employee},
-    types::{DepartmentToEmployeeMap, EmployeeSet},
-};
+use crate::Employee;
 
-pub fn create_sample_data() -> DepartmentToEmployeeMap {
-    btree_map! {
-	Department::Accounting => EmployeeSet::new(),
-	Department::Engineering => EmployeeSet::new(),
-	Department::Marketing => EmployeeSet::new(),
-	Department::Sales => EmployeeSet::new(),
-	Department::None => btree_set! {
-	    Employee { name: "Steven".to_string(), salary: 24000.00 },
-	    Employee { name: "Neena".to_string(), salary: 17000.00 },
-	    Employee { name: "Lex".to_string(), salary: 17000.00 },
-	    Employee { name: "Alexander".to_string(), salary: 9000.00 },
-	    Employee { name: "Bruce".to_string(), salary: 6000.00 },
-	    Employee { name: "David".to_string(), salary: 4800.00 },
-	    Employee { name: "Valli".to_string(), salary: 4800.00 },
-	    Employee { name: "Diana".to_string(), salary: 4200.00 },
-	    Employee { name: "Nancy".to_string(), salary: 12000.00 },
-	    Employee { name: "Daniel".to_string(), salary: 9000.00 },
-	    Employee { name: "John".to_string(), salary: 8200.00 },
-	    Employee { name: "Ismael".to_string(), salary: 7700.00 },
-	    Employee { name: "Jose Manuel".to_string(), salary: 7800.00 },
-	    Employee { name: "Luis".to_string(), salary: 6900.00 },
-	    Employee { name: "Den".to_string(), salary: 11000.00 },
-	    Employee { name: "Alexander".to_string(), salary: 3100.00 },
-	    Employee { name: "Shelli".to_string(), salary: 2900.00 },
-	    Employee { name: "Sigal".to_string(), salary: 2800.00 },
-	    Employee { name: "Guy".to_string(), salary: 2600.00 },
-	    Employee { name: "Karen".to_string(), salary: 2500.00 },
-	    Employee { name: "Matthew".to_string(), salary: 8000.00 },
-	    Employee { name: "Adam".to_string(), salary: 8200.00 },
-	    Employee { name: "Payam".to_string(), salary: 7900.00 },
-	    Employee { name: "Shanta".to_string(), salary: 6500.00 },
-	    Employee { name: "Irene".to_string(), salary: 2700.00 },
-	    Employee { name: "John".to_string(), salary: 14000.00 },
-	    Employee { name: "Karen".to_string(), salary: 13500.00 },
-	    Employee { name: "Jonathon".to_string(), salary: 8600.00 },
-	    Employee { name: "Jack".to_string(), salary: 8400.00 },
-	    Employee { name: "Kimberely".to_string(), salary: 7000.00 },
-	    Employee { name: "Charles".to_string(), salary: 6200.00 },
-	    Employee { name: "Sarah".to_string(), salary: 4000.00 },
-	    Employee { name: "Britney".to_string(), salary: 3900.00 },
-	    Employee { name: "Jennifer".to_string(), salary: 4400.00 },
-	    Employee { name: "Michael".to_string(), salary: 13000.00 },
-	    Employee { name: "Pat".to_string(), salary: 6000.00 },
-	    Employee { name: "Susan".to_string(), salary: 6500.00 },
-	    Employee { name: "Hermann".to_string(), salary: 10000.00 },
-	    Employee { name: "Shelley".to_string(), salary: 12000.00 },
-	    Employee { name: "William".to_string(), salary: 8300.00 },
+pub struct EmployeeDb {
+    employees: HashMap<u32, Employee>,
+}
+
+impl EmployeeDb {
+    pub fn new() -> Self {
+	Self { employees: HashMap::new() }
+    }
+
+    pub fn bootstrap(&mut self) {
+	for employee in INITIAL_EMPLOYEES {
+	    self.insert(employee);
 	}
     }
+
+    pub fn insert(&mut self, employee: Employee) {
+	self.employees[&employee.id] = employee;
+    }
+
+
+    pub fn find_all(&self) -> impl Iterator<Item=&Employee> {
+	self.employees.values()
+    }
 }
+
+static INITIAL_EMPLOYEES: Vec<Employee> = vec![
+    Employee::new("Steven".to_string(), 24000.00),
+    Employee::new("Neena".to_string(), 17000.00),
+    Employee::new("Lex".to_string(), 17000.00),
+    Employee::new("Alexander".to_string(), 9000.00),
+    Employee::new("Bruce".to_string(), 6000.00),
+    Employee::new("David".to_string(), 4800.00),
+    Employee::new("Valli".to_string(), 4800.00),
+    Employee::new("Diana".to_string(), 4200.00),
+    Employee::new("Nancy".to_string(), 12000.00),
+    Employee::new("Daniel".to_string(), 9000.00),
+    Employee::new("John".to_string(), 8200.00),
+    Employee::new("Ismael".to_string(), 7700.00),
+    Employee::new("Jose Manuel".to_string(), 7800.00),
+    Employee::new("Luis".to_string(), 6900.00),
+    Employee::new("Den".to_string(), 11000.00),
+    Employee::new("Alexander".to_string(), 3100.00),
+    Employee::new("Shelli".to_string(), 2900.00),
+    Employee::new("Sigal".to_string(), 2800.00),
+    Employee::new("Guy".to_string(), 2600.00),
+    Employee::new("Karen".to_string(), 2500.00),
+    Employee::new("Matthew".to_string(), 8000.00),
+    Employee::new("Adam".to_string(), 8200.00),
+    Employee::new("Payam".to_string(), 7900.00),
+    Employee::new("Shanta".to_string(), 6500.00),
+    Employee::new("Irene".to_string(), 2700.00),
+    Employee::new("John".to_string(), 14000.00),
+    Employee::new("Karen".to_string(), 13500.00),
+    Employee::new("Jonathon".to_string(), 8600.00),
+    Employee::new("Jack".to_string(), 8400.00),
+    Employee::new("Kimberely".to_string(), 7000.00),
+    Employee::new("Charles".to_string(), 6200.00),
+    Employee::new("Sarah".to_string(), 4000.00),
+    Employee::new("Britney".to_string(), 3900.00),
+    Employee::new("Jennifer".to_string(), 4400.00),
+    Employee::new("Michael".to_string(), 13000.00),
+    Employee::new("Pat".to_string(), 6000.00),
+    Employee::new("Susan".to_string(), 6500.00),
+    Employee::new("Hermann".to_string(), 10000.00),
+    Employee::new("Shelley".to_string(), 12000.00),
+    Employee::new("William".to_string(), 8300.00),
+];

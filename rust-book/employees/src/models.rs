@@ -1,5 +1,6 @@
 use std::{hash::{Hasher, Hash}, cmp};
 
+use once_cell::sync::Lazy;
 use strum::{EnumIter, IntoStaticStr};
 
 
@@ -13,15 +14,26 @@ pub enum Department {
 }
 
 pub struct Employee {
+    pub id: u32,
     pub name: String,
     pub salary: f64,
+    pub department: Department,
 }
 
-impl Hash for Employee {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.name.hash(state)
+impl Employee {
+    pub fn new(name: String, salary: f64) -> Self {
+	static NEXT_ID: Lazy<u32> = Lazy::new(|| 0);
+	let employee = Employee {
+	    id: *NEXT_ID,
+	    name,
+	    salary,
+	    department: Department::None,
+	};
+	*NEXT_ID += 1;
+	employee
     }
 }
+
 
 impl PartialEq for Employee {
     fn eq(&self, other: &Self) -> bool {
