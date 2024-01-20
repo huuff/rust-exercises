@@ -34,8 +34,7 @@ async fn hello_world(Query(query): Query<InputQuery>, headers: HeaderMap) -> imp
         .unwrap_or(rust_i18n::locale().to_string())
         ;
 
-    // TODO: Avoid to_string?
-    let name = query.name.unwrap_or(t!("world", locale = &language).to_string());
+    let name = query.name.as_deref().map(|it| Cow::from(it)).unwrap_or(t!("world", locale = &language));
 
     t!("hello_name", locale = &language, name = name)
 }
