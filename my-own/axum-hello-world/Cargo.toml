@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 accept-language = "3.1.0"
 axum = { version="0.7.4", features=["query"]}
+axum-xml-up = "0.2.0"
 rust-i18n = "3.0.0"
 serde = { version="1.0.195", features=["derive"]}
 tokio = { version="1.35.1", features=["full"]}

@@ -2,8 +2,9 @@
 extern crate rust_i18n;
 extern crate accept_language;
 
-use axum::{Router, routing::get, extract::Query, response::IntoResponse, http::{HeaderMap, header, HeaderValue}};
-use serde::Deserialize;
+use axum::{Router, routing::get, extract::Query, response::IntoResponse, http::{HeaderMap, header, HeaderValue}, Json};
+use axum_xml_up::Xml;
+use serde::{Deserialize, Serialize};
 use rust_i18n::t;
 
 i18n!("locales", fallback = "en");
@@ -23,11 +24,29 @@ struct InputQuery {
     name: Option<String>,
 }
 
+#[derive(Serialize)]
+struct HelloResponse {
+    pub content: String,
+}
+
+impl HelloResponse {
+    pub fn new(content: String) -> Self {
+        Self { content } 
+    }
+}
+
+
 // TODO: Maybe some logging
 async fn hello_world(Query(query): Query<InputQuery>, headers: HeaderMap) -> impl IntoResponse {
     let request_language = headers.get(header::ACCEPT_LANGUAGE);
 
-    get_hello_string(query.name, request_language)
+    let hello_string = get_hello_string(query.name, request_language);
+
+    match headers.get(header::ACCEPT).and_then(|it| it.to_str().ok()) {
+        Some("application/json") => Json(HelloResponse::new(hello_string)).into_response(),
+        Some("text/xml") => Xml(HelloResponse::new(hello_string)).into_response(),
+        _ => hello_string.into_response(),
+    }
 }
 
 
