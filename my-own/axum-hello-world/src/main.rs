@@ -24,7 +24,7 @@ struct InputQuery {
 }
 
 // TODO: Rename input_query to just query
-async fn hello_world(Query(input_query): Query<InputQuery>, headers: HeaderMap) -> impl IntoResponse {
+async fn hello_world(Query(query): Query<InputQuery>, headers: HeaderMap) -> impl IntoResponse {
     let request_accept_language = headers.get(header::ACCEPT_LANGUAGE)
         // TODO: Error handling
         .map(|it| it.to_str().unwrap());
@@ -36,7 +36,7 @@ async fn hello_world(Query(input_query): Query<InputQuery>, headers: HeaderMap) 
         ;
 
     // TODO: Avoid to_string?
-    let name = input_query.name.unwrap_or(t!("world", locale = &language).to_string());
+    let name = query.name.unwrap_or(t!("world", locale = &language).to_string());
 
     t!("hello_name", locale = &language, name = name)
 }
