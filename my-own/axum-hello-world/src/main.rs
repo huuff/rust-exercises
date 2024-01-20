@@ -1,5 +1,12 @@
-use axum::{Router, routing::get, extract::Query, response::IntoResponse};
+#[macro_use]
+extern crate rust_i18n;
+extern crate accept_language;
+
+use axum::{Router, routing::get, extract::Query, response::IntoResponse, http::{HeaderMap, header}};
 use serde::Deserialize;
+use rust_i18n::t;
+
+i18n!("locales", fallback = "en");
 
 #[tokio::main]
 async fn main() {
@@ -16,8 +23,20 @@ struct InputQuery {
     name: Option<String>,
 }
 
-async fn hello_world(Query(input_query): Query<InputQuery>) -> impl IntoResponse {
-    let name = input_query.name.as_deref().unwrap_or("World");
+// TODO: Rename input_query to just query
+async fn hello_world(Query(input_query): Query<InputQuery>, headers: HeaderMap) -> impl IntoResponse {
+    let request_accept_language = headers.get(header::ACCEPT_LANGUAGE)
+        // TODO: Error handling
+        .map(|it| it.to_str().unwrap());
+    let language = request_accept_language
+        .map(|request_accept_language| accept_language::intersection(request_accept_language, &rust_i18n::available_locales!()[..]))
+        .and_then(|common_languages| common_languages.into_iter().next())
+        // TODO: Avoid to_string?
+        .unwrap_or(rust_i18n::locale().to_string())
+        ;
 
-    format!("Hello, {name}!")
+    // TODO: Avoid to_string?
+    let name = input_query.name.unwrap_or(t!("world", locale = &language).to_string());
+
+    t!("hello_name", locale = &language, name = name)
 }

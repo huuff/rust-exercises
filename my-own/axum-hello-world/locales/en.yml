@@ -1,0 +1,3 @@
+_version: 1
+hello_name: "Hello, %{name}!" 
+world: "World"
