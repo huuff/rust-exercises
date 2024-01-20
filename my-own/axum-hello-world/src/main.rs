@@ -23,7 +23,6 @@ struct InputQuery {
     name: Option<String>,
 }
 
-// TODO: Rename input_query to just query
 async fn hello_world(Query(query): Query<InputQuery>, headers: HeaderMap) -> impl IntoResponse {
     let request_accept_language = headers.get(header::ACCEPT_LANGUAGE)
         // TODO: Error handling
