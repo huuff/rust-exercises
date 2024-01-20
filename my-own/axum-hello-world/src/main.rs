@@ -1,7 +1,5 @@
-
-// fn hello_world_handler
-
-use axum::{response::IntoResponse, Router, routing::get};
+use axum::{Router, routing::get, extract::Query, response::IntoResponse};
+use serde::Deserialize;
 
 #[tokio::main]
 async fn main() {
@@ -13,6 +11,13 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn hello_world() -> impl IntoResponse {
-    "Hello world"
+#[derive(Deserialize)]
+struct InputQuery {
+    name: Option<String>,
+}
+
+async fn hello_world(Query(input_query): Query<InputQuery>) -> impl IntoResponse {
+    let name = input_query.name.as_deref().unwrap_or("World");
+
+    format!("Hello, {name}!")
 }
