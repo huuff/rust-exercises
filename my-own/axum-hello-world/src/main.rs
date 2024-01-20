@@ -24,11 +24,11 @@ struct InputQuery {
 }
 
 async fn hello_world(Query(query): Query<InputQuery>, headers: HeaderMap) -> impl IntoResponse {
-    let request_accept_language = headers.get(header::ACCEPT_LANGUAGE)
+    let request_language = headers.get(header::ACCEPT_LANGUAGE)
         // TODO: Error handling
         .map(|it| it.to_str().unwrap());
-    let language = request_accept_language
-        .map(|request_accept_language| accept_language::intersection(request_accept_language, &rust_i18n::available_locales!()[..]))
+    let language = request_language
+        .map(|request_language| accept_language::intersection(request_language, &rust_i18n::available_locales!()[..]))
         .and_then(|common_languages| common_languages.into_iter().next())
         // TODO: Avoid to_string?
         .unwrap_or(rust_i18n::locale().to_string())
